@@ -5,7 +5,8 @@ bg = new BackgroundLayer
 vnc = new ViewNavigationController
 
 vnc.animationOptions =
-	curve: "spring(160,10,0)"
+	curve: "ease-in-out"
+	time: 0.3
 
 # # # # # # # # # # # # # # # # # # # # # # # #
 # VIEWS
@@ -30,6 +31,9 @@ viewUpdate = new Layer
 	width: 750, height: 1334
 	image: "images/screen_04_update.png"
 	superLayer: vnc
+
+# To remove the back button from a view, do this:
+# viewUpdate.backButton = false
 
 # # # # # # # # # # # # # # # # # # # # # # # #
 # BUTTONS
