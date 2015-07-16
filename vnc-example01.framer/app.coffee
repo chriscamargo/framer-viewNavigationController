@@ -4,6 +4,7 @@ bg = new BackgroundLayer
 
 vnc = new ViewNavigationController
 
+# This is optional, but allows you to customize the transition
 vnc.animationOptions =
 	curve: "ease-in-out"
 	time: 0.3
