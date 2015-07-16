@@ -2,16 +2,16 @@ class exports.ViewNavigationController extends Layer
 
 	# Setup Class Constants
 	INITIAL_VIEW_NAME = "initialView"
-	BACKBUTTON_VIEW_NAME = "vnc-BackButton"
+	BACKBUTTON_VIEW_NAME = "vnc-backButton"
 	ANIMATION_OPTIONS = 
 		time: 0.3
 		curve: "ease-in-out"
 	BACK_BUTTON_FRAME = 
 		x: 0
 		y: 40
-		width: 188
+		width: 88
 		height: 88
-	PUSH = 
+	PUSH =
 		UP:     "pushUp"
 		DOWN:   "pushDown"
 		LEFT:   "pushLeft"
@@ -22,6 +22,7 @@ class exports.ViewNavigationController extends Layer
 		DOWN:  "down"
 		LEFT:  "left"
 		RIGHT: "right"
+	DEBUG_MODE = false
 		
 	# Setup Instance and Instance Variables	
 	constructor: (@options={}) ->
@@ -38,6 +39,8 @@ class exports.ViewNavigationController extends Layer
 		@history = []
 		@animationOptions = @options.animationOptions or ANIMATION_OPTIONS
 		@initialViewName  = @options.initialViewName  or INITIAL_VIEW_NAME
+		@backButtonFrame  = @options.backButtonFrame  or BACK_BUTTON_FRAME
+		@debugMode        = @options.debugMode        or DEBUG_MODE
 		
 		@.on "change:subLayers", (changeList) ->
 			@addView subLayer, true for subLayer in changeList.added
@@ -129,22 +132,24 @@ class exports.ViewNavigationController extends Layer
 	_getLastHistoryItem: () ->
 		return @history[@history.length - 1]
 
-	_applyBackButton: (view, frame = BACK_BUTTON_FRAME) ->
+	_applyBackButton: (view, frame = @backButtonFrame) ->
 		Utils.delay 0, =>
-			backButton = new Layer
-				name: BACKBUTTON_VIEW_NAME
-				backgroundColor: "transparent"
-				width: 80
-				height: 80
-				superLayer: view
+			if view.backButton isnt false
+				backButton = new Layer
+					name: BACKBUTTON_VIEW_NAME
+					width: 80
+					height: 80
+					superLayer: view
 
-			backButton.frame = frame
+				if @debugMode is false
+					backButton.backgroundColor = "transparent"
 
-			backButton.on Events.Click, =>
-				@back()
+				backButton.frame = frame
+
+				backButton.on Events.Click, =>
+					@back()
 		
     
-
 
 ################################################################################
 # USAGE EXAMPLE 1 - Define InitialViewName #####################################
