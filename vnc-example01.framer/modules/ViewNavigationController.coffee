@@ -38,6 +38,7 @@ class exports.ViewNavigationController extends Layer
 		@history = []
 		@animationOptions = @options.animationOptions or ANIMATION_OPTIONS
 		@initialViewName  = @options.initialViewName  or INITIAL_VIEW_NAME
+		@backButton       = @options.backButton ?= true
 		@backButtonFrame  = @options.backButtonFrame  or BACK_BUTTON_FRAME
 		@debugMode        = @options.debugMode        or DEBUG_MODE
 		
@@ -80,8 +81,9 @@ class exports.ViewNavigationController extends Layer
 		
 		unless view.superLayer is @ or viaInternalChangeEvent
 			view.superLayer = @
-			
-		@_applyBackButton view unless view.name is @initialViewName
+		
+		if @backButton is true
+			@_applyBackButton view unless view.name is @initialViewName
 			
 		@views.push view
 
