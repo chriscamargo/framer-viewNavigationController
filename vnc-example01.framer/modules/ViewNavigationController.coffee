@@ -8,7 +8,7 @@ class exports.ViewNavigationController extends Layer
 	BACK_BUTTON_FRAME = 
 		x: 0
 		y: 40
-		width: 88
+		width: 88*2
 		height: 88
 	PUSH =
 		UP:     "pushUp"
