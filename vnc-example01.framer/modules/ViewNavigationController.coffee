@@ -38,7 +38,7 @@ class exports.ViewNavigationController extends Layer
 		@history = []
 		@animationOptions = @options.animationOptions or ANIMATION_OPTIONS
 		@initialViewName  = @options.initialViewName  or INITIAL_VIEW_NAME
-		@backButton       = @options.backButton ?= true
+		@backButton       = @options.backButton       ?= true
 		@backButtonFrame  = @options.backButtonFrame  or BACK_BUTTON_FRAME
 		@debugMode        = @options.debugMode        or DEBUG_MODE
 		
@@ -124,7 +124,7 @@ class exports.ViewNavigationController extends Layer
 
 	removeBackButton: (view) ->
 		Utils.delay 0, =>
-			view.subLayersByName(BACKBUTTON_VIEW_NAME)[0].visible = false
+			view.subLayersByName(BACKBUTTON_VIEW_NAME)[0].destroy()
 
 	back: () ->
 		@transition(@_getLastHistoryItem(), direction = DIR.LEFT, switchInstant = false, preventHistory = true)
