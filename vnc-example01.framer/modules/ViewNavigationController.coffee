@@ -3,9 +3,8 @@ class exports.ViewNavigationController extends Layer
 	# Setup Class Constants
 	INITIAL_VIEW_NAME = "initialView"
 	BACKBUTTON_VIEW_NAME = "vnc-backButton"
-	ANIMATION_OPTIONS = 
-		time: 0.3
-		curve: "ease-in-out"
+	ANIMATION_OPTIONS =
+		curve: "spring(400,40,0)"
 	BACK_BUTTON_FRAME = 
 		x: 0
 		y: 40
@@ -42,7 +41,7 @@ class exports.ViewNavigationController extends Layer
 		@backButtonFrame  = @options.backButtonFrame  or BACK_BUTTON_FRAME
 		@debugMode        = @options.debugMode        or DEBUG_MODE
 		
-		@.on "change:subLayers", (changeList) ->
+		@on "change:subLayers", (changeList) ->
 			@addView subLayer, true for subLayer in changeList.added
 
 	addView: (view, viaInternalChangeEvent) ->
