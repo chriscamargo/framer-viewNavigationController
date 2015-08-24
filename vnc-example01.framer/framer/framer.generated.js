@@ -692,7 +692,7 @@ Runtime = (function(superClass) {
         error.lineNumber = ((ref = result.error.location) != null ? ref.first_line : void 0) + 1;
       }
       bridge.sendError(error);
-      throw new Error("Framer syntax error line " + error.lineNumber + ": " + e.message);
+      throw new Error("Framer syntax error line " + error.lineNumber + ": " + error.message);
     }
     return result;
   };

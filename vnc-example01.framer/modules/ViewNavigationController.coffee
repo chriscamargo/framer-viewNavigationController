@@ -1,188 +1,50 @@
 class exports.ViewNavigationController extends Layer
-
-	# Setup Class Constants
-	INITIAL_VIEW_NAME = "initialView"
-	BACKBUTTON_VIEW_NAME = "vnc-backButton"
-	ANIMATION_OPTIONS =
-		curve: "spring(400,40,0)"
-	BACK_BUTTON_FRAME = 
-		x: 0
-		y: 40
-		width: 88*2
-		height: 88
-	PUSH =
-		UP:     "pushUp"
-		DOWN:   "pushDown"
-		LEFT:   "pushLeft"
-		RIGHT:  "pushRight"
-		CENTER: "pushCenter"
-	DIR =
-		UP:    "up"
-		DOWN:  "down"
-		LEFT:  "left"
-		RIGHT: "right"
-	DEBUG_MODE = false
 		
-	# Setup Instance and Instance Variables	
-	constructor: (@options={}) ->
-
-		@views = @history = @initialView = @currentView = @previousView = @animationOptions = @initialViewName = null
-		@options.width           ?= Screen.width
-		@options.height          ?= Screen.height
-		@options.clip            ?= true
-		@options.backgroundColor ?= "#999"
+	constructor: (options={}) ->
+		options.width ?= Screen.width
+		options.height ?= Screen.height
+		options.clip ?= true
+		options.animationOptions ?= curve: "spring(400,40)"
+		options.backgroundColor ?= "rgba(190,190,190,0.9)"
+		super options
 		
-		super @options
-		
-		@views   = []
 		@history = []
-		@animationOptions = @options.animationOptions or ANIMATION_OPTIONS
-		@initialViewName  = @options.initialViewName  or INITIAL_VIEW_NAME
-		@backButton       = @options.backButton       ?= true
-		@backButtonFrame  = @options.backButtonFrame  or BACK_BUTTON_FRAME
-		@debugMode        = @options.debugMode        or DEBUG_MODE
-		
-		@on "change:subLayers", (changeList) ->
-			@addView subLayer, true for subLayer in changeList.added
-
-	addView: (view, viaInternalChangeEvent) ->
-		
-		vncWidth  = @options.width
-		vncHeight = @options.height
-
-		view.states.add(
-			"#{ PUSH.UP }":
-				x: 0
-				y: -vncHeight
-			"#{ PUSH.LEFT }":
-				x: -vncWidth
-				y: 0
-			"#{ PUSH.CENTER }":
-				x: 0
-				y: 0
-			"#{ PUSH.RIGHT }":
-				x: vncWidth
-				y: 0
-			"#{ PUSH.DOWN }":
-				x: 0
-				y: vncHeight
-		)
-
-			
+				
+	add: (view, point = {x:0, y:0}) ->
+		subLayer.ignoreEvents = true for subLayer in @subLayers
+		view.ignoreEvents = false
+		view.superLayer = @
+		view.point = point
+		view.states.add
+			up:     {x: 0, y: -@height}
+			right:  {x: @width, y: 0}
+			down:   {x: 0, y: @height}
+			left:   {x: -@width, y: 0}
 		view.states.animationOptions = @animationOptions
+		@current = view
 		
-		if view.name is @initialViewName
-			@initialView = view
-			@currentView = view
-			view.states.switchInstant PUSH.CENTER
-			@history.push view
-		else
-			view.states.switchInstant PUSH.RIGHT
+	moveIn: (view, direction = 'default') ->
+		unless view is @current
+			@history.unshift
+				view: @current
+				direction: direction
+			@current = view
+			subLayer.ignoreEvents = true for subLayer in @subLayers
+			view.ignoreEvents = false
+			view.bringToFront()
+			view.states.switchInstant direction
+			view.states.switch 'default'
+			@emit("change:view")
 		
-		unless view.superLayer is @ or viaInternalChangeEvent
-			view.superLayer = @
+	moveOut: (view, direction = 'right') ->
+		subLayer.ignoreEvents = false for subLayer in @subLayers
+		view.states.switchInstant 'default'
+		view.states.switch direction
+		previous = @history[0]
+		@current = previous.view
+		@history.shift()
+		@emit("change:view")
 		
-		if @backButton is true
-			@_applyBackButton view unless view.name is @initialViewName
-			
-		@views.push view
-
-	transition: (view, direction = DIR.RIGHT, switchInstant = false, preventHistory = false) ->
-
-		return false if view is @currentView
-		
-		# Setup Views for the transition
-		
-		if direction is DIR.RIGHT
-			view.states.switchInstant  PUSH.RIGHT
-			@currentView.states.switch PUSH.LEFT
-		else if direction is DIR.DOWN
-			view.states.switchInstant  PUSH.DOWN
-			@currentView.states.switch PUSH.UP
-		else if direction is DIR.LEFT
-			view.states.switchInstant  PUSH.LEFT
-			@currentView.states.switch PUSH.RIGHT
-		else if direction is DIR.UP
-			view.states.switchInstant  PUSH.UP
-			@currentView.states.switch PUSH.DOWN
-		else
-			# If they specified something different just switch immediately
-			view.states.switchInstant PUSH.CENTER
-			@currentView.states.switchInstant PUSH.LEFT
-		
-		# Push view to Center
-		view.states.switch PUSH.CENTER
-		# currentView is now our previousView
-		@previousView = @currentView
-		# Set our currentView to the view we're bringing in
-		@currentView = view
-
-		# Store the last view in history
-		@history.push @previousView if preventHistory is false
-		
-		@emit Events.Change
-
-	removeBackButton: (view) ->
-		Utils.delay 0, =>
-			view.subLayersByName(BACKBUTTON_VIEW_NAME)[0].destroy()
-
-	back: () ->
-		@transition(@_getLastHistoryItem(), direction = DIR.LEFT, switchInstant = false, preventHistory = true)
-		@history.pop()
-
-	_getLastHistoryItem: () ->
-		return @history[@history.length - 1]
-
-	_applyBackButton: (view, frame = @backButtonFrame) ->
-		Utils.delay 0, =>
-			if view.backButton isnt false
-				backButton = new Layer
-					name: BACKBUTTON_VIEW_NAME
-					width: 80
-					height: 80
-					superLayer: view
-
-				if @debugMode is false
-					backButton.backgroundColor = "transparent"
-
-				backButton.frame = frame
-
-				backButton.on Events.Click, =>
-					@back()
-		
-    
-
-################################################################################
-# USAGE EXAMPLE 1 - Define InitialViewName #####################################
-
-# initialViewKey = "view1"
-# 
-# vnc = new ViewNavigationController initialViewName: initialViewKey
-# view1 = new Layer
-# 	name: initialViewKey
-# 	width:  Screen.width
-# 	height: Screen.height
-# 	backgroundColor: "red"
-# 	superLayer: vnc
-
-################################################################################
-# USAGE EXAMPLE 2 - Use default initialViewName "initialView" ##################
-
-# vnc = new ViewNavigationController
-
-# view1 = new Layer
-# 	name: "initialView"
-# 	width:  Screen.width
-# 	height: Screen.height
-# 	backgroundColor: "red"
-# 	superLayer: vnc
-	
-# view2 = new Layer
-# 	width:  Screen.width
-# 	height: Screen.height
-# 	backgroundColor: "green"
-# 	superLayer: vnc
-
-# view1.on Events.Click, -> vnc.transition view2
-# view2.on Events.Click, -> vnc.back()
-	
+	back: ->
+		if @history[0]?
+			@moveOut @current, @history[0].direction, false

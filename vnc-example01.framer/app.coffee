@@ -1,40 +1,42 @@
 {ViewNavigationController} = require "ViewNavigationController"
-
-bg = new BackgroundLayer
-
 vnc = new ViewNavigationController
 
 # This is optional, but allows you to customize the transition
-vnc.animationOptions =
-	curve: "ease-in-out"
-	time: 0.3
+# vnc.animationOptions =
+# 	curve: "ease-in-out"
+# 	time: 0.3
 
 # # # # # # # # # # # # # # # # # # # # # # # #
 # VIEWS
 # # # # # # # # # # # # # # # # # # # # # # # #
 viewSettings = new Layer
-	name: "initialView"
 	width: 750, height: 1334
 	image: "images/screen_01_settings.png"
-	superLayer: vnc
 
 viewGeneral = new Layer
 	width: 750, height: 1334
 	image: "images/screen_02_general.png"
-	superLayer: vnc
 
 viewSiri = new Layer
 	width: 750, height: 1334
 	image: "images/screen_03_siri.png"
-	superLayer: vnc
 	
 viewUpdate = new Layer
 	width: 750, height: 1334
 	image: "images/screen_04_update.png"
-	superLayer: vnc
-
-# To remove the back button from a view, do this:
-# viewUpdate.backButton = false
+	
+# for view in [viewSettings, viewGeneral,viewSiri,viewUpdate]
+	
+for view in [viewSettings,viewGeneral,viewSiri,viewUpdate]
+	vnc.add view
+	btnBack = new Layer
+		superLayer: view
+		backgroundColor: ""
+		width: 88*2
+		y: 40
+	btnBack.on Events.Click, -> vnc.back()
+	
+vnc.moveIn viewSettings
 
 # # # # # # # # # # # # # # # # # # # # # # # #
 # BUTTONS
@@ -64,11 +66,6 @@ btnUpdate = new Layer
 # # # # # # # # # # # # # # # # # # # # # # # #
 # EVENTS
 # # # # # # # # # # # # # # # # # # # # # # # #
-btnGeneral.on Events.Click, ->
-	vnc.transition viewGeneral
-	
-btnSiri.on Events.Click, ->
-	vnc.transition viewSiri
-
-btnUpdate.on Events.Click, ->
-	vnc.transition viewUpdate
+btnGeneral.on Events.Click, -> vnc.moveIn viewGeneral, 'right'
+btnSiri.on Events.Click, -> vnc.moveIn viewSiri, 'right'
+btnUpdate.on Events.Click, -> vnc.moveIn viewUpdate, 'right'
