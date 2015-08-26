@@ -1,8 +1,8 @@
 {ViewNavigationController} = require "ViewNavigationController"
-vnc = new ViewNavigationController
+Views = new ViewNavigationController
 
 # This is optional, but allows you to customize the transition
-# vnc.animationOptions =
+# Views.animationOptions =
 # 	curve: "ease-in-out"
 # 	time: 0.3
 
@@ -28,20 +28,21 @@ viewUpdate = new Layer
 # for view in [viewSettings, viewGeneral,viewSiri,viewUpdate]
 	
 for view in [viewSettings,viewGeneral,viewSiri,viewUpdate]
-	vnc.add view
+	Views.add view
 	btnBack = new Layer
 		superLayer: view
 		backgroundColor: ""
 		width: 88*2
 		y: 40
-	btnBack.on Events.Click, -> vnc.back()
+	btnBack.on Events.Click, -> Views.back()
 	
-vnc.moveIn viewSettings
+Views.moveIn viewSettings
 
 # # # # # # # # # # # # # # # # # # # # # # # #
 # BUTTONS
 # # # # # # # # # # # # # # # # # # # # # # # #
 btnGeneral = new Layer
+	name: "gen"
 	width: Screen.width
 	height: 88
 	y: 1130
@@ -62,10 +63,11 @@ btnUpdate = new Layer
 	backgroundColor: "transparent"
 	superLayer: viewGeneral
 
+# Views.fadeIn page1
 
 # # # # # # # # # # # # # # # # # # # # # # # #
 # EVENTS
 # # # # # # # # # # # # # # # # # # # # # # # #
-btnGeneral.on Events.Click, -> vnc.moveIn viewGeneral, 'right'
-btnSiri.on Events.Click, -> vnc.moveIn viewSiri, 'right'
-btnUpdate.on Events.Click, -> vnc.moveIn viewUpdate, 'right'
+btnGeneral.on Events.Click, -> Views.slideInRight viewGeneral
+btnSiri.on Events.Click, -> Views.slideInUp viewSiri
+btnUpdate.on Events.Click, -> Views.slideInLeft viewUpdate

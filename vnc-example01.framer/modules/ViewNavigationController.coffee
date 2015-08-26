@@ -23,18 +23,33 @@ class exports.ViewNavigationController extends Layer
 		view.states.animationOptions = @animationOptions
 		@current = view
 		
-	moveIn: (view, direction = 'default') ->
+	saveToHistory: (direction) ->
+		@history.unshift
+			view: @current
+			direction: direction
+
+	back: ->
+		if @history[0]?
+			@moveOut @current, @history[0].direction, false
+
+	appear: (view, direction) ->
 		unless view is @current
-			@history.unshift
-				view: @current
-				direction: direction
+			@saveToHistory direction
 			@current = view
 			subLayer.ignoreEvents = true for subLayer in @subLayers
 			view.ignoreEvents = false
 			view.bringToFront()
-			view.states.switchInstant direction
-			view.states.switch 'default'
-			@emit("change:view")
+
+	slideInRight: (view) -> @moveIn view, 'right'
+	slideInLeft: (view) -> @moveIn view, 'left'
+	slideInUp: (view) -> @moveIn view, 'up'
+	slideInDown: (view) -> @moveIn view, 'down'
+
+	moveIn: (view, direction = 'default') ->
+		@appear view, direction
+		view.states.switchInstant direction
+		view.states.switch 'default'
+		@emit("change:view")
 		
 	moveOut: (view, direction = 'right') ->
 		subLayer.ignoreEvents = false for subLayer in @subLayers
@@ -45,6 +60,4 @@ class exports.ViewNavigationController extends Layer
 		@history.shift()
 		@emit("change:view")
 		
-	back: ->
-		if @history[0]?
-			@moveOut @current, @history[0].direction, false
+	
