@@ -45,11 +45,17 @@ class exports.ViewNavigationController extends Layer
 	slideInUp: (view) -> @moveIn view, 'up'
 	slideInDown: (view) -> @moveIn view, 'down'
 
+
 	moveIn: (view, direction = 'default') ->
-		@appear view, direction
-		view.states.switchInstant direction
-		view.states.switch 'default'
-		@emit("change:view")
+		unless view is @current
+			@saveToHistory direction
+			@current = view
+			subLayer.ignoreEvents = true for subLayer in @subLayers
+			view.ignoreEvents = false
+			view.bringToFront()
+			view.states.switchInstant direction
+			view.states.switch 'default'
+			@emit("change:view")
 		
 	moveOut: (view, direction = 'right') ->
 		subLayer.ignoreEvents = false for subLayer in @subLayers
