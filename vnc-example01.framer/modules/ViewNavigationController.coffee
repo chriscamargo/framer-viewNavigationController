@@ -11,59 +11,75 @@ class exports.ViewNavigationController extends Layer
 		@history = []
 				
 	add: (view, point = {x:0, y:0}) ->
-		subLayer.ignoreEvents = true for subLayer in @subLayers
-		view.ignoreEvents = false
+		#subLayer.ignoreEvents = true for subLayer in @subLayers
+		#view.ignoreEvents = false
 		view.superLayer = @
 		view.point = point
-		view.states.add
-			up:     {x: 0, y: -@height}
-			right:  {x: @width, y: 0}
-			down:   {x: 0, y: @height}
-			left:   {x: -@width, y: 0}
-		view.states.animationOptions = @animationOptions
+		# view.states.add
+		# 	up:     {x: 0, y: -@height}
+		# 	right:  {x: @width, y: 0}
+		# 	down:   {x: 0, y: @height}
+		# 	left:   {x: -@width, y: 0}
+		# view.states.animationOptions = @animationOptions
 		@current = view
 		
-	saveToHistory: (direction) ->
+	saveCurrentToHistory: (animation) ->
 		@history.unshift
 			view: @current
-			direction: direction
+			animation: animation
 
 	back: ->
 		if @history[0]?
-			@moveOut @current, @history[0].direction, false
+			#subLayer.ignoreEvents = false for subLayer in @subLayers
+			#@current.states.switchInstant 'default'
+			#print @history[0].name
+			#@history[0].opacity = 0.4
+			anim = @history[0].animation
+			backwards = anim.reverse()
+			backwards.start()
+			backwards.on Events.AnimationEnd, =>
+				previous = @history[0]
+				@current = previous.view
+				@history.shift()
 
-	appear: (view, direction) ->
+
+	# appear: (view, direction = 'default') ->
+	# 	@current = view
+	# 	#subLayer.ignoreEvents = true for subLayer in @subLayers
+	# 	#view.ignoreEvents = false
+		
+
+	applyAnimation: (view, animProperties, animationOptions) ->
 		unless view is @current
-			@saveToHistory direction
+			_.extend animProperties, animationOptions
+			anim = view.animate animProperties
+			@saveCurrentToHistory anim
 			@current = view
-			subLayer.ignoreEvents = true for subLayer in @subLayers
-			view.ignoreEvents = false
 			view.bringToFront()
 
-	slideInRight: (view) -> @moveIn view, 'right'
-	slideInLeft: (view) -> @moveIn view, 'left'
-	slideInUp: (view) -> @moveIn view, 'up'
-	slideInDown: (view) -> @moveIn view, 'down'
+	### ANIMATIONS <3 ###
 
+	slideInRight: (view, animationOptions = curve: "spring(400,40)") -> 
+		view.x = @width
+		animProperties =
+			properties:
+				x: 0
+		@applyAnimation view, animProperties, animationOptions
 
-	moveIn: (view, direction = 'default') ->
-		unless view is @current
-			@saveToHistory direction
-			@current = view
-			subLayer.ignoreEvents = true for subLayer in @subLayers
-			view.ignoreEvents = false
-			view.bringToFront()
-			view.states.switchInstant direction
-			view.states.switch 'default'
-			@emit("change:view")
-		
-	moveOut: (view, direction = 'right') ->
-		subLayer.ignoreEvents = false for subLayer in @subLayers
-		view.states.switchInstant 'default'
-		view.states.switch direction
-		previous = @history[0]
-		@current = previous.view
-		@history.shift()
-		@emit("change:view")
-		
-	
+	fadeIn: (view, animationOptions = time: .2) -> 
+		view.opacity = 0
+		animProperties =
+			properties:
+				opacity: 1
+		@applyAnimation view, animProperties, animationOptions
+			
+	spinIn: (view, animationOptions = curve: "spring(200,30)") -> 
+		view.rotation = 0
+		view.opacity = 0
+		view.scale = 0.4
+		animProperties =
+			properties:
+				rotation: 360
+				opacity: 1
+				scale: 1
+		@applyAnimation view, animProperties, animationOptions

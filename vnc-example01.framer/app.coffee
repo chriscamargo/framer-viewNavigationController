@@ -1,3 +1,4 @@
+document.body.style.cursor = "auto"
 {ViewNavigationController} = require "ViewNavigationController"
 Views = new ViewNavigationController
 
@@ -10,18 +11,22 @@ Views = new ViewNavigationController
 # VIEWS
 # # # # # # # # # # # # # # # # # # # # # # # #
 viewSettings = new Layer
+	name: 'settings'
 	width: 750, height: 1334
 	image: "images/screen_01_settings.png"
 
 viewGeneral = new Layer
+	name: 'general'
 	width: 750, height: 1334
 	image: "images/screen_02_general.png"
 
 viewSiri = new Layer
+	name: 'siri'
 	width: 750, height: 1334
 	image: "images/screen_03_siri.png"
 	
 viewUpdate = new Layer
+	name: 'update'
 	width: 750, height: 1334
 	image: "images/screen_04_update.png"
 	
@@ -30,14 +35,15 @@ viewUpdate = new Layer
 for view in [viewSettings,viewGeneral,viewSiri,viewUpdate]
 	Views.add view
 	btnBack = new Layer
+		name: 'btnback'
 		superLayer: view
 		backgroundColor: ""
 		width: 88*2
 		y: 40
-	btnBack.on Events.Click, -> Views.back()
+	btnBack.on Events.Click, -> 
+		Views.back()
 	
-Views.moveIn viewSettings
-
+Views.fadeIn viewSettings
 # # # # # # # # # # # # # # # # # # # # # # # #
 # BUTTONS
 # # # # # # # # # # # # # # # # # # # # # # # #
@@ -63,11 +69,12 @@ btnUpdate = new Layer
 	backgroundColor: "transparent"
 	superLayer: viewGeneral
 
-# Views.fadeIn page1
+Views.fadeIn viewSettings
 
 # # # # # # # # # # # # # # # # # # # # # # # #
 # EVENTS
 # # # # # # # # # # # # # # # # # # # # # # # #
-btnGeneral.on Events.Click, -> Views.slideInRight viewGeneral
-btnSiri.on Events.Click, -> Views.slideInUp viewSiri
-btnUpdate.on Events.Click, -> Views.slideInLeft viewUpdate
+btnGeneral.on Events.Click, -> 
+	Views.slideInRight viewGeneral
+btnSiri.on Events.Click, -> Views.fadeIn viewSiri
+btnUpdate.on Events.Click, -> Views.spinIn viewUpdate
