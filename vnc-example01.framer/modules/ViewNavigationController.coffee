@@ -1,3 +1,10 @@
+# TODO:
+# Ignore all events not part of children to @current (avoid click through)
+# Add custom animationOptions to .back()?
+# Add "moveOut" animations? what's the use case? covered by back?
+# If no need for moveOut, maybe we wont need consistent "In" naming scheme
+# test use case with ios native push messages
+
 class exports.ViewNavigationController extends Layer
 		
 	constructor: (options={}) ->
@@ -6,21 +13,15 @@ class exports.ViewNavigationController extends Layer
 		options.clip ?= true
 		options.animationOptions ?= curve: "spring(400,40)"
 		options.backgroundColor ?= "rgba(190,190,190,0.9)"
+		options.perspective ?= 1000
+
 		super options
-		
 		@history = []
 				
 	add: (view, point = {x:0, y:0}) ->
-		#subLayer.ignoreEvents = true for subLayer in @subLayers
-		#view.ignoreEvents = false
+		view.ignoreEvents = true
 		view.superLayer = @
 		view.point = point
-		# view.states.add
-		# 	up:     {x: 0, y: -@height}
-		# 	right:  {x: @width, y: 0}
-		# 	down:   {x: 0, y: @height}
-		# 	left:   {x: -@width, y: 0}
-		# view.states.animationOptions = @animationOptions
 		@current = view
 		
 	saveCurrentToHistory: (animation) ->
@@ -28,12 +29,8 @@ class exports.ViewNavigationController extends Layer
 			view: @current
 			animation: animation
 
-	back: ->
+	back: -> 
 		if @history[0]?
-			#subLayer.ignoreEvents = false for subLayer in @subLayers
-			#@current.states.switchInstant 'default'
-			#print @history[0].name
-			#@history[0].opacity = 0.4
 			anim = @history[0].animation
 			backwards = anim.reverse()
 			backwards.start()
@@ -42,25 +39,41 @@ class exports.ViewNavigationController extends Layer
 				@current = previous.view
 				@history.shift()
 
-
-	# appear: (view, direction = 'default') ->
-	# 	@current = view
-	# 	#subLayer.ignoreEvents = true for subLayer in @subLayers
-	# 	#view.ignoreEvents = false
-		
-
 	applyAnimation: (view, animProperties, animationOptions) ->
 		unless view is @current
 			_.extend animProperties, animationOptions
 			anim = view.animate animProperties
 			@saveCurrentToHistory anim
 			@current = view
-			view.bringToFront()
+			@current.bringToFront()
 
-	### ANIMATIONS <3 ###
+	### ANIMATIONS ###
+
+	switchInstant: (view) -> @fadeIn view, time: 0
+
+	slideInUp: (view, animationOptions = curve: "spring(400,40)") -> 
+		view.y = -@height
+		animProperties =
+			properties:
+				y: 0
+		@applyAnimation view, animProperties, animationOptions
+
+	slideInDown: (view, animationOptions = curve: "spring(400,40)") -> 
+		view.y = @height
+		animProperties =
+			properties:
+				y: 0
+		@applyAnimation view, animProperties, animationOptions
 
 	slideInRight: (view, animationOptions = curve: "spring(400,40)") -> 
 		view.x = @width
+		animProperties =
+			properties:
+				x: 0
+		@applyAnimation view, animProperties, animationOptions
+
+	slideInLeft: (view, animationOptions = curve: "spring(400,40)") -> 
+		view.x = -@width
 		animProperties =
 			properties:
 				x: 0
@@ -73,13 +86,42 @@ class exports.ViewNavigationController extends Layer
 				opacity: 1
 		@applyAnimation view, animProperties, animationOptions
 			
-	spinIn: (view, animationOptions = curve: "spring(200,30)") -> 
-		view.rotation = 0
+	zoomIn: (view, animationOptions = curve: "spring(400,40)") -> 
+		view.scale = 0.8
 		view.opacity = 0
-		view.scale = 0.4
 		animProperties =
 			properties:
-				rotation: 360
-				opacity: 1
 				scale: 1
+				opacity: 1
+		@applyAnimation view, animProperties, animationOptions
+
+	zoomedIn: (view, animationOptions = curve: "spring(400,40)") -> 
+		view.scale = 1.5
+		view.opacity = 0
+		animProperties =
+			properties:
+				scale: 1
+				opacity: 1
+		@applyAnimation view, animProperties, animationOptions
+
+	flipInRight: (view, animationOptions = curve: "spring(300,40)") -> 
+		view.x = @width/2
+		view.rotationY = 100
+		view.z = 800
+		animProperties =
+			properties:
+				x: 0
+				rotationY: 0
+				z: 0
+		@applyAnimation view, animProperties, animationOptions
+
+	flipInLeft: (view, animationOptions = curve: "spring(300,40)") -> 
+		view.x = -@width/2
+		view.rotationY = -100
+		view.z = 800
+		animProperties =
+			properties:
+				x: 0
+				rotationY: 0
+				z: 0
 		@applyAnimation view, animProperties, animationOptions

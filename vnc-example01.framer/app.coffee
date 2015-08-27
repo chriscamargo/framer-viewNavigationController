@@ -43,7 +43,6 @@ for view in [viewSettings,viewGeneral,viewSiri,viewUpdate]
 	btnBack.on Events.Click, -> 
 		Views.back()
 	
-Views.fadeIn viewSettings
 # # # # # # # # # # # # # # # # # # # # # # # #
 # BUTTONS
 # # # # # # # # # # # # # # # # # # # # # # # #
@@ -69,12 +68,14 @@ btnUpdate = new Layer
 	backgroundColor: "transparent"
 	superLayer: viewGeneral
 
-Views.fadeIn viewSettings
+Views.switchInstant viewSettings
+
+## TODOS:
+# General is not clickable after being inside the menu?!
 
 # # # # # # # # # # # # # # # # # # # # # # # #
 # EVENTS
 # # # # # # # # # # # # # # # # # # # # # # # #
-btnGeneral.on Events.Click, -> 
-	Views.slideInRight viewGeneral
+btnGeneral.on Events.Click, -> Views.flipInRight viewGeneral
 btnSiri.on Events.Click, -> Views.fadeIn viewSiri
-btnUpdate.on Events.Click, -> Views.spinIn viewUpdate
+btnUpdate.on Events.Click, -> Views.switchInstant viewUpdate
