@@ -22,7 +22,9 @@ class exports.ViewNavigationController extends Layer
 	add: (view, point = {x:0, y:0}) ->
 		#view.ignoreEvents = true
 		view.superLayer = @
-		view.point = point
+		view.x = @width
+		view.y = 0
+		#view.point = point
 		@current = view
 		
 	saveCurrentToHistory: (animation) ->
@@ -32,13 +34,15 @@ class exports.ViewNavigationController extends Layer
 
 	back: -> 
 		if @history[0]?
+			@history[0].view.x = 0
+			@history[0].view.y = 0
 			anim = @history[0].animation
 			backwards = anim.reverse()
 			backwards.start()
-			backwards.on Events.AnimationEnd, =>
-				previous = @history[0]
-				@current = previous.view
-				@history.shift()
+			#backwards.on Events.AnimationEnd, =>
+			previous = @history[0]
+			@current = previous.view
+			@history.shift()
 
 	applyAnimation: (view, animProperties, animationOptions) ->
 		unless view is @current
@@ -46,13 +50,14 @@ class exports.ViewNavigationController extends Layer
 			anim = view.animate animProperties
 			@saveCurrentToHistory anim
 			anim.on Events.AnimationEnd, => 
-				# previous = @history[0].view // Move out of view to avoid click through?
-				# previous.x = @width
+				previous = @history[0].view
+				#@subLayersIgnoreEvents previous, true
+				previous.x = @width
 			@current = view
 			@current.bringToFront()
 
 	subLayersIgnoreEvents: (view, boolean) ->
-		#print view
+		print view
 		view.ignoreEvents = boolean
 		for subLayer in view.subLayers
 			@subLayersIgnoreEvents subLayer, boolean
@@ -63,6 +68,7 @@ class exports.ViewNavigationController extends Layer
 	switchInstant: (view) -> @fadeIn view, time: 0
 
 	slideInUp: (view, animationOptions = curve: "spring(400,40)") -> 
+		view.x = 0
 		view.y = -@height
 		animProperties =
 			properties:
@@ -70,6 +76,7 @@ class exports.ViewNavigationController extends Layer
 		@applyAnimation view, animProperties, animationOptions
 
 	slideInDown: (view, animationOptions = curve: "spring(400,40)") -> 
+		view.x = 0
 		view.y = @height
 		animProperties =
 			properties:
@@ -77,6 +84,7 @@ class exports.ViewNavigationController extends Layer
 		@applyAnimation view, animProperties, animationOptions
 
 	slideInRight: (view, animationOptions = curve: "spring(400,40)") -> 
+		view.x = 0
 		view.x = @width
 		animProperties =
 			properties:
@@ -84,6 +92,7 @@ class exports.ViewNavigationController extends Layer
 		@applyAnimation view, animProperties, animationOptions
 
 	slideInLeft: (view, animationOptions = curve: "spring(400,40)") -> 
+		view.y = 0
 		view.x = -@width
 		animProperties =
 			properties:
@@ -100,6 +109,8 @@ class exports.ViewNavigationController extends Layer
 		@applyAnimation view, animProperties, animationOptions
 			
 	zoomIn: (view, animationOptions = curve: "spring(400,40)") -> 
+		view.x = 0
+		view.y = 0
 		view.scale = 0.8
 		view.opacity = 0
 		animProperties =
