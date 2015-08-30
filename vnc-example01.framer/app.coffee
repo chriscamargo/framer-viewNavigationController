@@ -5,15 +5,12 @@ Utils.globalLayers doc
 document.body.style.cursor = "auto"
 {ViewNavigationController} = require "ViewNavigationController"
 Views = new ViewNavigationController
-	backgroundColor: ""
 
 # # # # # # # # # # # # # # # # # # # # # # # #
 # VIEWS
 # # # # # # # # # # # # # # # # # # # # # # # #
 
 for screen in Layers.startingWith 'screen_'
-	screen.shadowBlur = 40
-	screen.shadowColor = "black"
 	Views.add screen
 	Views.flipInRight screen_settings
 	

@@ -22,9 +22,10 @@ class exports.ViewNavigationController extends Layer
 	add: (view, point = {x:0, y:0}) ->
 		#view.ignoreEvents = true
 		view.superLayer = @
-		view.x = @width
-		view.y = 0
-		#view.point = point
+		#view.x = @width
+		#view.y = 0
+		view.on Events.Click, -> return # prevent click-through/bubbling
+		view.point = point
 		@current = view
 		
 	saveCurrentToHistory: (animation) ->
@@ -34,12 +35,11 @@ class exports.ViewNavigationController extends Layer
 
 	back: -> 
 		if @history[0]?
-			@history[0].view.x = 0
-			@history[0].view.y = 0
+			#@history[0].view.x = 0
+			#@history[0].view.y = 0
 			anim = @history[0].animation
 			backwards = anim.reverse()
 			backwards.start()
-			
 			previous = @history[0]
 			@current = previous.view
 			backwards.on Events.AnimationEnd, =>
@@ -52,10 +52,11 @@ class exports.ViewNavigationController extends Layer
 			anim = view.animate animProperties
 			@saveCurrentToHistory anim
 			anim.on Events.AnimationEnd, => 
-				previous = @history[0].view
+				#previous = @history[0].view
 				#@subLayersIgnoreEvents previous, true
-				previous.x = @width
+				#previous.x = @width
 			@current = view
+			
 			@current.bringToFront()
 
 	subLayersIgnoreEvents: (view, boolean) ->
