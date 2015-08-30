@@ -51,12 +51,12 @@ class exports.ViewNavigationController extends Layer
 			_.extend animProperties, animationOptions
 			anim = view.animate animProperties
 			@saveCurrentToHistory anim
-			anim.on Events.AnimationEnd, => 
+			#anim.on Events.AnimationEnd, => 
 				#previous = @history[0].view
 				#@subLayersIgnoreEvents previous, true
 				#previous.x = @width
 			@current = view
-			
+			if @subLayers.indexOf(view) is -1 then @add view
 			@current.bringToFront()
 
 	subLayersIgnoreEvents: (view, boolean) ->

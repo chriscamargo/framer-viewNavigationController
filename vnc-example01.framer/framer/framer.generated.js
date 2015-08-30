@@ -91,7 +91,7 @@ window.__imported__["iosnav/layers.json.js"] = [
 
         ],
         "image" : {
-          "path" : "images\/Layer-btn_push-871348F8-B2BB-41A0-BAFF-C12176FFAC93.png",
+          "path" : "images\/Layer-modalbtn_push-871348F8-B2BB-41A0-BAFF-C12176FFAC93.png",
           "frame" : {
             "y" : -253,
             "x" : 101,
@@ -106,7 +106,7 @@ window.__imported__["iosnav/layers.json.js"] = [
           "width" : 119,
           "height" : 68
         },
-        "name" : "btn_push"
+        "name" : "modalbtn_push"
       }
     ],
     "image" : {
@@ -578,7 +578,7 @@ window.__imported__["iosnav/layers.json.js"] = [
       }
     ],
     "image" : {
-      "path" : "images\/Layer-screen_push-20D45910-21D6-400E-BC71-8E09ECA24914.png",
+      "path" : "images\/Layer-modal_push-20D45910-21D6-400E-BC71-8E09ECA24914.png",
       "frame" : {
         "y" : 1000,
         "x" : 2081,
@@ -593,7 +593,7 @@ window.__imported__["iosnav/layers.json.js"] = [
       "width" : 748,
       "height" : 1368
     },
-    "name" : "screen_push"
+    "name" : "modal_push"
   }
 ]
 if (typeof(DeviceComponent) !== "undefined") {DeviceComponent.Devices["iphone-6-silver"].deviceImageJP2 = false};
