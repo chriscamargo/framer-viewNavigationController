@@ -1,9 +1,7 @@
 # TODO:
-# Ignore all events not part of children to @current (avoid click through)
 # Add custom animationOptions to .back()?
 # Add "moveOut" animations? what's the use case? covered by back?
 # If no need for moveOut, maybe we wont need consistent "In" naming scheme
-# test use case with ios native push messages
 # add pages when trying to animate them. eg. if @subLayers.indexOf(view) is -1 then @add view
 
 class exports.ViewNavigationController extends Layer
@@ -22,6 +20,7 @@ class exports.ViewNavigationController extends Layer
 	add: (view, point = {x:0, y:0}) ->
 		view.superLayer = @
 		view.on Events.Click, -> return # prevent click-through/bubbling
+		view.originalPoint = point
 		view.point = point
 		@current = view
 		
@@ -67,28 +66,28 @@ class exports.ViewNavigationController extends Layer
 		view.y = -@height
 		animProperties =
 			properties:
-				y: 0
+				y: if view.originalPoint? then view.originalPoint.y else 0
 		@applyAnimation view, animProperties, animationOptions
 
-	slideInDown: (view, animationOptions = @animationOptions) -> 
+	slideInDown: (view, animationOptions = @animationOptions) ->
 		view.y = @height
 		animProperties =
 			properties:
-				y: 0
+				y: if view.originalPoint? then view.originalPoint.y else 0
 		@applyAnimation view, animProperties, animationOptions
 
 	slideInRight: (view, animationOptions = @animationOptions) -> 
 		view.x = @width
 		animProperties =
 			properties:
-				x: 0
+				x: if view.originalPoint? then view.originalPoint.x else 0
 		@applyAnimation view, animProperties, animationOptions
 
 	slideInLeft: (view, animationOptions = @animationOptions) -> 
 		view.x = -@width
 		animProperties =
 			properties:
-				x: 0
+				x: if view.originalPoint? then view.originalPoint.x else 0
 		@applyAnimation view, animProperties, animationOptions
 
 	fadeIn: (view, animationOptions = @animationOptions) -> 
@@ -122,7 +121,7 @@ class exports.ViewNavigationController extends Layer
 		view.z = 800
 		animProperties =
 			properties:
-				x: 0
+				x: if view.originalPoint? then view.originalPoint.x else 0
 				rotationY: 0
 				z: 0
 		@applyAnimation view, animProperties, animationOptions
@@ -133,7 +132,7 @@ class exports.ViewNavigationController extends Layer
 		view.z = 800
 		animProperties =
 			properties:
-				x: 0
+				x: if view.originalPoint? then view.originalPoint.x else 0
 				rotationY: 0
 				z: 0
 		@applyAnimation view, animProperties, animationOptions

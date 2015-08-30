@@ -103,6 +103,31 @@
           "height" : 68
         },
         "name" : "modalbtn_push"
+      },
+      {
+        "maskFrame" : null,
+        "id" : "A02F6ED3-D35B-4096-9B44-7BE81CFE0FD6",
+        "visible" : true,
+        "children" : [
+
+        ],
+        "image" : {
+          "path" : "images\/Layer-controlcenter_btn-A02F6ED3-D35B-4096-9B44-7BE81CFE0FD6.png",
+          "frame" : {
+            "y" : 812,
+            "x" : -505,
+            "width" : 750,
+            "height" : 59
+          }
+        },
+        "imageType" : "png",
+        "layerFrame" : {
+          "y" : 812,
+          "x" : -505,
+          "width" : 750,
+          "height" : 59
+        },
+        "name" : "controlcenter_btn"
       }
     ],
     "image" : {
@@ -502,16 +527,16 @@
     "image" : {
       "path" : "images\/Layer-controlcenter-90A89A56-B6D8-4B62-B2A3-7A2430F9EC3D.png",
       "frame" : {
-        "y" : -123,
-        "x" : -1567,
+        "y" : 1000,
+        "x" : -1453,
         "width" : 750,
         "height" : 995
       }
     },
     "imageType" : "png",
     "layerFrame" : {
-      "y" : -123,
-      "x" : -1567,
+      "y" : 1000,
+      "x" : -1453,
       "width" : 750,
       "height" : 995
     },
