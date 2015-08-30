@@ -4,6 +4,7 @@
 # Add "moveOut" animations? what's the use case? covered by back?
 # If no need for moveOut, maybe we wont need consistent "In" naming scheme
 # test use case with ios native push messages
+# add pages when trying to animate them. eg. if @subLayers.indexOf(view) is -1 then @add view
 
 class exports.ViewNavigationController extends Layer
 		
@@ -19,7 +20,7 @@ class exports.ViewNavigationController extends Layer
 		@history = []
 				
 	add: (view, point = {x:0, y:0}) ->
-		view.ignoreEvents = true
+		#view.ignoreEvents = true
 		view.superLayer = @
 		view.point = point
 		@current = view
@@ -44,8 +45,18 @@ class exports.ViewNavigationController extends Layer
 			_.extend animProperties, animationOptions
 			anim = view.animate animProperties
 			@saveCurrentToHistory anim
+			anim.on Events.AnimationEnd, => 
+				# previous = @history[0].view // Move out of view to avoid click through?
+				# previous.x = @width
 			@current = view
 			@current.bringToFront()
+
+	subLayersIgnoreEvents: (view, boolean) ->
+		#print view
+		view.ignoreEvents = boolean
+		for subLayer in view.subLayers
+			@subLayersIgnoreEvents subLayer, boolean
+			
 
 	### ANIMATIONS ###
 
@@ -80,6 +91,8 @@ class exports.ViewNavigationController extends Layer
 		@applyAnimation view, animProperties, animationOptions
 
 	fadeIn: (view, animationOptions = time: .2) -> 
+		view.x = 0
+		view.y = 0
 		view.opacity = 0
 		animProperties =
 			properties:
