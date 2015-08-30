@@ -12,7 +12,7 @@ class exports.ViewNavigationController extends Layer
 		options.width ?= Screen.width
 		options.height ?= Screen.height
 		options.clip ?= true
-		options.animationOptions ?= curve: "spring(400,40)"
+		options.animationOptions ?= curve: "bezier-curve(.2, 1, .2, 1)", time: .6
 		options.backgroundColor ?= "rgba(190,190,190,0.9)"
 		options.perspective ?= 1000
 
@@ -70,35 +70,35 @@ class exports.ViewNavigationController extends Layer
 
 	switchInstant: (view) -> @fadeIn view, time: 0
 
-	slideInUp: (view, animationOptions = curve: "spring(400,40)") -> 
+	slideInUp: (view, animationOptions = @animationOptions) -> 
 		view.y = -@height
 		animProperties =
 			properties:
 				y: 0
 		@applyAnimation view, animProperties, animationOptions
 
-	slideInDown: (view, animationOptions = curve: "spring(400,40)") -> 
+	slideInDown: (view, animationOptions = @animationOptions) -> 
 		view.y = @height
 		animProperties =
 			properties:
 				y: 0
 		@applyAnimation view, animProperties, animationOptions
 
-	slideInRight: (view, animationOptions = curve: "spring(400,40)") -> 
+	slideInRight: (view, animationOptions = @animationOptions) -> 
 		view.x = @width
 		animProperties =
 			properties:
 				x: 0
 		@applyAnimation view, animProperties, animationOptions
 
-	slideInLeft: (view, animationOptions = curve: "spring(400,40)") -> 
+	slideInLeft: (view, animationOptions = @animationOptions) -> 
 		view.x = -@width
 		animProperties =
 			properties:
 				x: 0
 		@applyAnimation view, animProperties, animationOptions
 
-	fadeIn: (view, animationOptions = time: .2) -> 
+	fadeIn: (view, animationOptions = @animationOptions) -> 
 		#view.point = x: 0, y: 0
 		view.opacity = 0
 		animProperties =
@@ -106,7 +106,7 @@ class exports.ViewNavigationController extends Layer
 				opacity: 1
 		@applyAnimation view, animProperties, animationOptions
 			
-	zoomIn: (view, animationOptions = curve: "spring(400,40)") -> 
+	zoomIn: (view, animationOptions = @animationOptions) -> 
 		#view.point = x: 0, y: 0
 		view.scale = 0.8
 		view.opacity = 0
@@ -116,7 +116,7 @@ class exports.ViewNavigationController extends Layer
 				opacity: 1
 		@applyAnimation view, animProperties, animationOptions
 
-	zoomedIn: (view, animationOptions = curve: "spring(400,40)") -> 
+	zoomedIn: (view, animationOptions = @animationOptions) -> 
 		view.point = x: 0, y: 0
 		view.scale = 1.5
 		view.opacity = 0
@@ -126,7 +126,7 @@ class exports.ViewNavigationController extends Layer
 				opacity: 1
 		@applyAnimation view, animProperties, animationOptions
 
-	flipInRight: (view, animationOptions = curve: "spring(300,40)") -> 
+	flipInRight: (view, animationOptions = @animationOptions) -> 
 		view.x = @width/2
 		view.rotationY = 100
 		view.z = 800
@@ -137,7 +137,7 @@ class exports.ViewNavigationController extends Layer
 				z: 0
 		@applyAnimation view, animProperties, animationOptions
 
-	flipInLeft: (view, animationOptions = curve: "spring(300,40)") -> 
+	flipInLeft: (view, animationOptions = @animationOptions) -> 
 		view.x = -@width/2
 		view.rotationY = -100
 		view.z = 800
