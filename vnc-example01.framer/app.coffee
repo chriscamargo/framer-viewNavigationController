@@ -9,7 +9,8 @@ Views = new ViewNavigationController
 # VIEWS
 # # # # # # # # # # # # # # # # # # # # # # # #
 
-Views.add screen for screen in Layers.startingWith 'screen_'
+#Views.add screen for screen in Layers.startingWith 'screen_'
+Views.switchInstant screen_settings
 # # # # # # # # # # # # # # # # # # # # # # # #
 # BUTTONS
 # # # # # # # # # # # # # # # # # # # # # # # #
@@ -21,7 +22,7 @@ for btn in Layers.startingWith 'btn_'
 		Views.slideInRight screen
 		
 modalbtn_push.on Events.Click, ->
-	Views.zoomedIn modal_push
+	Views.fadeIn modal_push
 
 for btn in Layers.withName 'backbtn'
 	btn.on Events.Click, -> Views.back()

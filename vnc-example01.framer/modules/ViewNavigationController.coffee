@@ -20,10 +20,7 @@ class exports.ViewNavigationController extends Layer
 		@history = []
 				
 	add: (view, point = {x:0, y:0}) ->
-		#view.ignoreEvents = true
 		view.superLayer = @
-		#view.x = @width
-		#view.y = 0
 		view.on Events.Click, -> return # prevent click-through/bubbling
 		view.point = point
 		@current = view
@@ -34,27 +31,23 @@ class exports.ViewNavigationController extends Layer
 			animation: animation
 
 	back: -> 
-		if @history[0]?
-			#@history[0].view.x = 0
-			#@history[0].view.y = 0
-			anim = @history[0].animation
+		previous = @history[0]
+		if previous.view?
+			anim = previous.animation
 			backwards = anim.reverse()
 			backwards.start()
-			previous = @history[0]
 			@current = previous.view
+			@history.shift()
 			backwards.on Events.AnimationEnd, =>
 				@current.bringToFront()
-			@history.shift()
+			
 
 	applyAnimation: (view, animProperties, animationOptions) ->
 		unless view is @current
 			_.extend animProperties, animationOptions
 			anim = view.animate animProperties
 			@saveCurrentToHistory anim
-			#anim.on Events.AnimationEnd, => 
-				#previous = @history[0].view
-				#@subLayersIgnoreEvents previous, true
-				#previous.x = @width
+			#anim.on Events.AnimationEnd, =>
 			@current = view
 			if @subLayers.indexOf(view) is -1 then @add view
 			@current.bringToFront()
@@ -99,7 +92,6 @@ class exports.ViewNavigationController extends Layer
 		@applyAnimation view, animProperties, animationOptions
 
 	fadeIn: (view, animationOptions = @animationOptions) -> 
-		#view.point = x: 0, y: 0
 		view.opacity = 0
 		animProperties =
 			properties:
@@ -107,7 +99,6 @@ class exports.ViewNavigationController extends Layer
 		@applyAnimation view, animProperties, animationOptions
 			
 	zoomIn: (view, animationOptions = @animationOptions) -> 
-		#view.point = x: 0, y: 0
 		view.scale = 0.8
 		view.opacity = 0
 		animProperties =
@@ -117,7 +108,6 @@ class exports.ViewNavigationController extends Layer
 		@applyAnimation view, animProperties, animationOptions
 
 	zoomedIn: (view, animationOptions = @animationOptions) -> 
-		view.point = x: 0, y: 0
 		view.scale = 1.5
 		view.opacity = 0
 		animProperties =
