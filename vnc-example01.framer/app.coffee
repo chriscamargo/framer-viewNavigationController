@@ -20,7 +20,7 @@ for btn in Layers.startingWith 'btn_'
 	btn.opacity = 0
 	btn.on Events.Click, ->
 		screen = Layers.get @name.replace('btn_','screen_')
-		Views.slideInRight screen
+		Views.slideInDown screen
 		
 modalbtn_push.on Events.Click, ->
 	Views.zoomedIn modal_push
@@ -31,5 +31,5 @@ for btn in Layers.withName 'backbtn'
 
 Views.add controlcenter, {x: 0, y: 360}
 Views.switchInstant screen_settings
-controlcenter_btn.on Events.Click, -> Views.slideInDown controlcenter
+controlcenter_btn.on Events.Click, -> Views.slideInUp controlcenter
 controlcenter.on Events.Click, -> Views.back()

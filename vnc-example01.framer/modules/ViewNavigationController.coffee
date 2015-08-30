@@ -2,7 +2,6 @@
 # Add custom animationOptions to .back()?
 # Add "moveOut" animations? what's the use case? covered by back?
 # If no need for moveOut, maybe we wont need consistent "In" naming scheme
-# add pages when trying to animate them. eg. if @subLayers.indexOf(view) is -1 then @add view
 
 class exports.ViewNavigationController extends Layer
 		
@@ -39,7 +38,6 @@ class exports.ViewNavigationController extends Layer
 			@history.shift()
 			backwards.on Events.AnimationEnd, =>
 				@current.bringToFront()
-			
 
 	applyAnimation: (view, animProperties, animationOptions) ->
 		unless view is @current
@@ -51,25 +49,19 @@ class exports.ViewNavigationController extends Layer
 			if @subLayers.indexOf(view) is -1 then @add view
 			@current.bringToFront()
 
-	subLayersIgnoreEvents: (view, boolean) ->
-		print view
-		view.ignoreEvents = boolean
-		for subLayer in view.subLayers
-			@subLayersIgnoreEvents subLayer, boolean
-			
 
 	### ANIMATIONS ###
 
 	switchInstant: (view) -> @fadeIn view, time: 0
 
-	slideInUp: (view, animationOptions = @animationOptions) -> 
+	slideInDown: (view, animationOptions = @animationOptions) -> 
 		view.y = -@height
 		animProperties =
 			properties:
 				y: if view.originalPoint? then view.originalPoint.y else 0
 		@applyAnimation view, animProperties, animationOptions
 
-	slideInDown: (view, animationOptions = @animationOptions) ->
+	slideInUp: (view, animationOptions = @animationOptions) ->
 		view.y = @height
 		animProperties =
 			properties:
