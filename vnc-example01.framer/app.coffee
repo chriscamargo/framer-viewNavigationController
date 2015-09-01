@@ -10,7 +10,7 @@ Views = new ViewNavigationController
 # # # # # # # # # # # # # # # # # # # # # # # #
 
 # Preload views by adding them. Not needed, but may avoid jitter on first load
-Views.add screen for screen in Layers.startingWith 'screen_'
+#Views.add screen for screen in Layers.startingWith 'screen_'
 
 # # # # # # # # # # # # # # # # # # # # # # # #
 # BUTTONS
@@ -20,7 +20,7 @@ for btn in Layers.startingWith 'btn_'
 	btn.opacity = 0
 	btn.on Events.Click, ->
 		screen = Layers.get @name.replace('btn_','screen_')
-		Views.slideInDown screen
+		Views.slideInRight screen
 		
 modalbtn_push.on Events.Click, ->
 	Views.zoomedIn modal_push

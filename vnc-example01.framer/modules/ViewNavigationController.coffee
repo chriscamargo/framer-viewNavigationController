@@ -41,10 +41,11 @@ class exports.ViewNavigationController extends Layer
 
 	applyAnimation: (view, animProperties, animationOptions) ->
 		unless view is @current
-			_.extend animProperties, animationOptions
-			anim = view.animate animProperties
-			@saveCurrentToHistory anim
-			#anim.on Events.AnimationEnd, =>
+			obj = layer: view
+			_.extend obj, animProperties, animationOptions
+			animation = new Animation obj
+			animation.start()
+			@saveCurrentToHistory animation
 			@current = view
 			if @subLayers.indexOf(view) is -1 then @add view
 			@current.bringToFront()
