@@ -3,13 +3,25 @@ A simple controller for FramerJS that allows you to transition between views wit
 
 #### Features
 - Built in method for transitioning between views.
-- Customize the transition by choosing up, down, left, or right transitions.
-- Customize the movement by providing animationOptions.
-- Automatically places back buttons in your flow at the top left of your views.
+- Multiple animations (fade, slide, flip + more)
+- Customize the movement by providing animationOptions
+- Automatically saves history when switching view
+- Automatically plays the transition backwards when using .back
 
-#### TODO
-- Moar documentation.
-- Capture transition direction in history (currently "Back" only slides to the left)
-- Allow custom states for building unique screen-to-screen transitions.
+#### Setup
+- Import module
+- Create a new instance of the controller, eg. Views = new ViewNavigationController
+- Call one of the transition methods, eg. Views.slideInRight sketch.settingspage
 
-Now accepting pull requests!
+
+### Supported transitions
+.switchInstant view
+.slideInDown(view, animationOptions)
+.slideInUp(view, animationOptions)
+.slideInRight(view, animationOptions)
+.slideInLeft(view, animationOptions)
+.fadeIn(view, animationOptions)
+.zoomIn(view, animationOptions)
+.zoomedIn(view, animationOptions)
+.flipInRight(view, animationOptions)
+.flipInLeft(view, animationOptions)
