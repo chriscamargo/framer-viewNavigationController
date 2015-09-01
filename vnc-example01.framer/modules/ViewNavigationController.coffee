@@ -2,6 +2,7 @@
 # Add custom animationOptions to .back()?
 # Add "moveOut" animations? what's the use case? covered by back?
 # If no need for moveOut, maybe we wont need consistent "In" naming scheme
+# Fix jittering for when you haven't preloaded layers using .add
 
 class exports.ViewNavigationController extends Layer
 		
@@ -17,11 +18,13 @@ class exports.ViewNavigationController extends Layer
 		@history = []
 				
 	add: (view, point = {x:0, y:0}) ->
-		view.superLayer = @
-		view.on Events.Click, -> return # prevent click-through/bubbling
-		view.originalPoint = point
-		view.point = point
-		@current = view
+		if @subLayers.indexOf(view) is -1
+			view.superLayer = @
+			#view.sendToBack()
+			view.on Events.Click, -> return # prevent click-through/bubbling
+			view.originalPoint = point
+			view.point = point
+			#@current = view
 		
 	saveCurrentToHistory: (animation) ->
 		@history.unshift
@@ -47,7 +50,6 @@ class exports.ViewNavigationController extends Layer
 			animation.start()
 			@saveCurrentToHistory animation
 			@current = view
-			if @subLayers.indexOf(view) is -1 then @add view
 			@current.bringToFront()
 
 
@@ -56,6 +58,8 @@ class exports.ViewNavigationController extends Layer
 	switchInstant: (view) -> @fadeIn view, time: 0
 
 	slideInDown: (view, animationOptions = @animationOptions) -> 
+		@add view
+
 		view.y = -@height
 		animProperties =
 			properties:
@@ -63,34 +67,44 @@ class exports.ViewNavigationController extends Layer
 		@applyAnimation view, animProperties, animationOptions
 
 	slideInUp: (view, animationOptions = @animationOptions) ->
+		@add view
+
 		view.y = @height
 		animProperties =
 			properties:
 				y: if view.originalPoint? then view.originalPoint.y else 0
 		@applyAnimation view, animProperties, animationOptions
 
-	slideInRight: (view, animationOptions = @animationOptions) -> 
+	slideInRight: (view, animationOptions = @animationOptions) ->
+		@add view
+
 		view.x = @width
 		animProperties =
 			properties:
 				x: if view.originalPoint? then view.originalPoint.x else 0
 		@applyAnimation view, animProperties, animationOptions
 
-	slideInLeft: (view, animationOptions = @animationOptions) -> 
+	slideInLeft: (view, animationOptions = @animationOptions) ->
+		@add view
+
 		view.x = -@width
 		animProperties =
 			properties:
 				x: if view.originalPoint? then view.originalPoint.x else 0
 		@applyAnimation view, animProperties, animationOptions
 
-	fadeIn: (view, animationOptions = @animationOptions) -> 
+	fadeIn: (view, animationOptions = @animationOptions) ->
+		@add view
+
 		view.opacity = 0
 		animProperties =
 			properties:
 				opacity: 1
 		@applyAnimation view, animProperties, animationOptions
 			
-	zoomIn: (view, animationOptions = @animationOptions) -> 
+	zoomIn: (view, animationOptions = @animationOptions) ->
+		@add view
+
 		view.scale = 0.8
 		view.opacity = 0
 		animProperties =
@@ -99,7 +113,9 @@ class exports.ViewNavigationController extends Layer
 				opacity: 1
 		@applyAnimation view, animProperties, animationOptions
 
-	zoomedIn: (view, animationOptions = @animationOptions) -> 
+	zoomedIn: (view, animationOptions = @animationOptions) ->
+		@add view
+
 		view.scale = 1.5
 		view.opacity = 0
 		animProperties =
@@ -108,7 +124,9 @@ class exports.ViewNavigationController extends Layer
 				opacity: 1
 		@applyAnimation view, animProperties, animationOptions
 
-	flipInRight: (view, animationOptions = @animationOptions) -> 
+	flipInRight: (view, animationOptions = @animationOptions) ->
+		@add view
+
 		view.x = @width/2
 		view.rotationY = 100
 		view.z = 800
@@ -119,7 +137,9 @@ class exports.ViewNavigationController extends Layer
 				z: 0
 		@applyAnimation view, animProperties, animationOptions
 
-	flipInLeft: (view, animationOptions = @animationOptions) -> 
+	flipInLeft: (view, animationOptions = @animationOptions) ->
+		@add view
+
 		view.x = -@width/2
 		view.rotationY = -100
 		view.z = 800
