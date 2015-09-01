@@ -15,13 +15,13 @@ A simple controller for FramerJS that allows you to transition between views wit
 
 
 ### Supported transitions
-.switchInstant view
-.slideInDown(view, animationOptions)
-.slideInUp(view, animationOptions)
-.slideInRight(view, animationOptions)
-.slideInLeft(view, animationOptions)
-.fadeIn(view, animationOptions)
-.zoomIn(view, animationOptions)
-.zoomedIn(view, animationOptions)
-.flipInRight(view, animationOptions)
-.flipInLeft(view, animationOptions)
+- .switchInstant view
+- .slideInDown(view, animationOptions)
+- .slideInUp(view, animationOptions)
+- .slideInRight(view, animationOptions)
+- .slideInLeft(view, animationOptions)
+- .fadeIn(view, animationOptions)
+- .zoomIn(view, animationOptions)
+- .zoomedIn(view, animationOptions)
+- .flipInRight(view, animationOptions)
+- .flipInLeft(view, animationOptions)
