@@ -18,13 +18,21 @@ class exports.ViewNavigationController extends Layer
 		@history = []
 				
 	add: (view, point = {x:0, y:0}) ->
-		if @subLayers.indexOf(view) is -1
-			view.superLayer = @
-			#view.sendToBack()
-			view.on Events.Click, -> return # prevent click-through/bubbling
-			view.originalPoint = point
-			view.point = point
-			#@current = view
+		view.superLayer = @
+		#view.sendToBack()
+		view.on Events.Click, -> return # prevent click-through/bubbling
+		view.originalPoint = point
+		view.point = point
+		#@current = view
+
+	readyToAnimate: (view) ->
+		if view isnt @current
+			if @subLayers.indexOf(view) is -1
+				@add view
+			return true
+		else
+			return false
+
 		
 	saveCurrentToHistory: (animation) ->
 		@history.unshift
@@ -58,7 +66,7 @@ class exports.ViewNavigationController extends Layer
 	switchInstant: (view) -> @fadeIn view, time: 0
 
 	slideInDown: (view, animationOptions = @animationOptions) -> 
-		@add view
+		return unless @readyToAnimate view
 
 		view.y = -@height
 		animProperties =
@@ -67,7 +75,7 @@ class exports.ViewNavigationController extends Layer
 		@applyAnimation view, animProperties, animationOptions
 
 	slideInUp: (view, animationOptions = @animationOptions) ->
-		@add view
+		return unless @readyToAnimate view
 
 		view.y = @height
 		animProperties =
@@ -76,7 +84,7 @@ class exports.ViewNavigationController extends Layer
 		@applyAnimation view, animProperties, animationOptions
 
 	slideInRight: (view, animationOptions = @animationOptions) ->
-		@add view
+		return unless @readyToAnimate view
 
 		view.x = @width
 		animProperties =
@@ -85,7 +93,7 @@ class exports.ViewNavigationController extends Layer
 		@applyAnimation view, animProperties, animationOptions
 
 	slideInLeft: (view, animationOptions = @animationOptions) ->
-		@add view
+		return unless @readyToAnimate view
 
 		view.x = -@width
 		animProperties =
@@ -94,7 +102,7 @@ class exports.ViewNavigationController extends Layer
 		@applyAnimation view, animProperties, animationOptions
 
 	fadeIn: (view, animationOptions = @animationOptions) ->
-		@add view
+		return unless @readyToAnimate view
 
 		view.opacity = 0
 		animProperties =
@@ -103,7 +111,7 @@ class exports.ViewNavigationController extends Layer
 		@applyAnimation view, animProperties, animationOptions
 			
 	zoomIn: (view, animationOptions = @animationOptions) ->
-		@add view
+		return unless @readyToAnimate view
 
 		view.scale = 0.8
 		view.opacity = 0
@@ -114,7 +122,7 @@ class exports.ViewNavigationController extends Layer
 		@applyAnimation view, animProperties, animationOptions
 
 	zoomedIn: (view, animationOptions = @animationOptions) ->
-		@add view
+		return unless @readyToAnimate view
 
 		view.scale = 1.5
 		view.opacity = 0
@@ -125,7 +133,7 @@ class exports.ViewNavigationController extends Layer
 		@applyAnimation view, animProperties, animationOptions
 
 	flipInRight: (view, animationOptions = @animationOptions) ->
-		@add view
+		return unless @readyToAnimate view
 
 		view.x = @width/2
 		view.rotationY = 100
@@ -138,7 +146,7 @@ class exports.ViewNavigationController extends Layer
 		@applyAnimation view, animProperties, animationOptions
 
 	flipInLeft: (view, animationOptions = @animationOptions) ->
-		@add view
+		return unless @readyToAnimate view
 
 		view.x = -@width/2
 		view.rotationY = -100
