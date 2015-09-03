@@ -157,3 +157,14 @@ class exports.ViewNavigationController extends Layer
 				rotationY: 0
 				z: 0
 		@applyAnimation view, animProperties, animationOptions
+	spinIn: (view, animationOptions = @animationOptions) ->
+		return unless @readyToAnimate view
+		view.opacity = 0
+		view.scale = 0.8
+		view.rotation = 180
+		animProperties =
+			properties:
+				opacity: 1
+				scale: 1
+				rotation: 0
+		@applyAnimation view, animProperties, animationOptions
