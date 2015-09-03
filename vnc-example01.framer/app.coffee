@@ -1,29 +1,42 @@
-Layers = require 'Layers'
-doc = Framer.Importer.load "imported/iosnav"
-Utils.globalLayers doc
-document.body.style.cursor = "auto"
-{ViewNavigationController} = require "ViewNavigationController"
+{ViewNavigationController} = require 'ViewNavigationController'
+
 Views = new ViewNavigationController
+	width: 500
+	height: 500
+	animationOptions: # defaults for each transition
+		time: 0.6 
+Views.center()
 
-# # # # # # # # # # # # # # # # # # # # # # # #
-# BUTTONS
-# # # # # # # # # # # # # # # # # # # # # # # #
+view1 = new Layer 
+	width: Views.width, height: Views.height
+	image: "http://bit.ly/1L86dhL"
+Utils.labelLayer view1, 'view1'
+	
+view2 = new Layer
+	width: Views.width, height: Views.height
+	image: "http://bit.ly/1UvvNCp"
+Utils.labelLayer view2, 'view2'
 
-for btn in Layers.startingWith 'btn_'
-	btn.opacity = 0
-	btn.on Events.Click, ->
-		screen = Layers.get @name.replace('btn_','screen_')
-		Views.slideInRight screen
-		
-modalbtn_push.on Events.Click, ->
-	Views.zoomedIn modal_push
+# Add views to the view controller
+Views.add view for view in [view1,view2]
+# Switch view to set the initial state
+Views.switchInstant view1
+# Set up transition on click
+view1.on Events.Click, -> Views.slideInRight view2
+# Go back in history and reverse the previous animation
+view2.on Events.Click, -> Views.back()
 
-for btn in Layers.withName 'backbtn'
-	btn.on Events.Click, -> Views.back()
-	btn.opacity = 0
-
-Views.add controlcenter, {x: 0, y: 340}
-controlcenter_btn.on Events.Click, -> Views.slideInUp controlcenter
-controlcenter.on Events.Click, -> Views.back()
-
-Views.switchInstant screen_settings
+### Transitions
+.switchInstant
+.slideInDown
+.slideInUp
+.slideInRight
+.slideInLeft
+.fadeIn
+.zoomIn
+.zoomedIn
+.flipInRight
+.flipInLeft
+.flipInUp
+.spinIn
+###
