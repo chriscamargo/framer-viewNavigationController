@@ -240,6 +240,40 @@ class exports.ViewNavigationController extends Layer
 				x: if view.originalPoint? then view.originalPoint.x else 0
 		@applyAnimation view, animProperties, animationOptions
 
+	pushInUp: (view, animationOptions = @animationOptions) ->
+		return unless @readyToAnimate view
+		move =
+			layer: @current
+			properties:
+				y: -@height
+		_.extend move, animationOptions
+		moveOut = new Animation move
+		moveOut.start()
+
+		view.x = 0
+		view.y = @height
+		animProperties =
+			properties:
+				y: if view.originalPoint? then view.originalPoint.y else 0
+		@applyAnimation view, animProperties, animationOptions
+
+	pushInDown: (view, animationOptions = @animationOptions) ->
+		return unless @readyToAnimate view
+		move =
+			layer: @current
+			properties:
+				y: @height
+		_.extend move, animationOptions
+		moveOut = new Animation move
+		moveOut.start()
+		
+		view.x = 0
+		view.y = -@height
+		animProperties =
+			properties:
+				y: if view.originalPoint? then view.originalPoint.y else 0
+		@applyAnimation view, animProperties, animationOptions
+
 	appleMail: (view, animationOptions = @animationOptions) ->
 		return unless @readyToAnimate view
 		move =
@@ -256,3 +290,11 @@ class exports.ViewNavigationController extends Layer
 			properties:
 				y: if view.originalPoint? then view.originalPoint.y else 100
 		@applyAnimation view, animProperties, animationOptions
+
+	# Backwards compatibility
+	transition: (view, direction = 'right') ->
+		switch direction
+			when 'up' then @pushInDown view
+			when 'right' then @pushInRight view
+			when 'down' then @pushInUp view
+			when 'left' then @pushInLeft view
