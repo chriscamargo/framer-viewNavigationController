@@ -122,10 +122,15 @@ class exports.ViewNavigationController extends Layer
 		return unless @readyToAnimate view
 
 		view.opacity = 0
+		view.x = 0
+		view.y = 0
 		animProperties =
 			properties:
 				opacity: 1
 		@applyAnimation view, animProperties, animationOptions
+
+	crossDissolve: (view, animationOptions = @animationOptions) ->
+		@fadeIn view, animationOptions
 			
 	zoomIn: (view, animationOptions = @animationOptions) ->
 		return unless @readyToAnimate view
