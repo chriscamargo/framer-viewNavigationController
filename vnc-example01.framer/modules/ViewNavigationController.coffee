@@ -54,6 +54,7 @@ class exports.ViewNavigationController extends Layer
 				properties:
 					x: if previous.view.originalPoint? then previous.view.originalPoint.x else 0
 					y: if previous.view.originalPoint? then previous.view.originalPoint.y else 0
+					scale: 1
 
 			animation = new Animation animProperties
 			animation.options.curveOptions = previous.animation.options.curveOptions
@@ -237,4 +238,21 @@ class exports.ViewNavigationController extends Layer
 		animProperties =
 			properties:
 				x: if view.originalPoint? then view.originalPoint.x else 0
+		@applyAnimation view, animProperties, animationOptions
+
+	appleMail: (view, animationOptions = @animationOptions) ->
+		return unless @readyToAnimate view
+		move =
+			layer: @current
+			properties:
+				scale: 0.8
+		_.extend move, animationOptions
+		moveOut = new Animation move
+		moveOut.start()
+
+		view.y = @height
+		view.x = 0
+		animProperties =
+			properties:
+				y: if view.originalPoint? then view.originalPoint.y else 100
 		@applyAnimation view, animProperties, animationOptions
