@@ -22,12 +22,14 @@ Views.add view for view in [view1,view2]
 # Switch view to set the initial state
 Views.switchInstant view1
 # Set up transition on click
-view1.on Events.Click, -> Views.slideInRight view2
+view1.on Events.Click, -> Views.pushInRight view2
 # Go back in history and reverse the previous animation
 view2.on Events.Click, -> Views.back()
 
 ### Transitions
 .switchInstant
+.pushInRight
+.pushInLeft
 .slideInDown
 .slideInUp
 .slideInRight

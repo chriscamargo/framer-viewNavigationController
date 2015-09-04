@@ -2,7 +2,6 @@
 # Add custom animationOptions to .back()?
 # Add "moveOut" animations? what's the use case? covered by back?
 # If no need for moveOut, maybe we wont need consistent "In" naming scheme
-# Fix jittering for when you haven't preloaded layers using .add
 
 class exports.ViewNavigationController extends Layer
 		
@@ -19,11 +18,9 @@ class exports.ViewNavigationController extends Layer
 				
 	add: (view, point = {x:0, y:0}) ->
 		view.superLayer = @
-		#view.sendToBack()
 		view.on Events.Click, -> return # prevent click-through/bubbling
 		view.originalPoint = point
 		view.point = point
-		#@current = view
 
 	readyToAnimate: (view) ->
 		if view isnt @current
@@ -42,6 +39,17 @@ class exports.ViewNavigationController extends Layer
 	back: -> 
 		previous = @history[0]
 		if previous.view?
+
+			animProperties = 
+				layer: previous.view
+				properties:
+					x: previous.view.originalPoint.x
+					y: previous.view.originalPoint.y
+
+			animation = new Animation animProperties
+			animation.options.curveOptions = previous.animation.options.curveOptions
+			animation.start()
+	
 			anim = previous.animation
 			backwards = anim.reverse()
 			backwards.start()
@@ -182,4 +190,37 @@ class exports.ViewNavigationController extends Layer
 				opacity: 1
 				scale: 1
 				rotation: 0
+		@applyAnimation view, animProperties, animationOptions
+
+
+	pushInRight: (view, animationOptions = @animationOptions) ->
+		return unless @readyToAnimate view
+		move =
+			layer: @current
+			properties:
+				x: -@width
+		_.extend move, animationOptions
+		moveOut = new Animation move
+		moveOut.start()
+
+		view.x = @width
+		animProperties =
+			properties:
+				x: if view.originalPoint? then view.originalPoint.x else 0
+		@applyAnimation view, animProperties, animationOptions
+
+	pushInLeft: (view, animationOptions = @animationOptions) ->
+		return unless @readyToAnimate view
+		move =
+			layer: @current
+			properties:
+				x: @width
+		_.extend move, animationOptions
+		moveOut = new Animation move
+		moveOut.start()
+
+		view.x = -@width
+		animProperties =
+			properties:
+				x: if view.originalPoint? then view.originalPoint.x else 0
 		@applyAnimation view, animProperties, animationOptions
