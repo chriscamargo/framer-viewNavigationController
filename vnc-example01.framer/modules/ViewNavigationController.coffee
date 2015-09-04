@@ -9,15 +9,24 @@ class exports.ViewNavigationController extends Layer
 		options.width ?= Screen.width
 		options.height ?= Screen.height
 		options.clip ?= true
+		options.initialViewName ?= 'initialView'
 		options.animationOptions ?= curve: "bezier-curve(.2, 1, .2, 1)", time: .6
 		options.backgroundColor ?= "rgba(190,190,190,0.9)"
 		options.perspective ?= 1000
 
 		super options
 		@history = []
-				
-	add: (view, point = {x:0, y:0}) ->
-		view.superLayer = @
+		@on "change:subLayers", (changeList) ->
+			if changeList.added[0].name is options.initialViewName
+				@switchInstant changeList.added[0]
+			else
+				changeList.added[0].x = @width
+
+	add: (view, point = {x:0, y:0}, viaInternalChangeEvent = false) ->
+		if viaInternalChangeEvent
+			@switchInstant view
+		else
+			view.superLayer = @
 		view.on Events.Click, -> return # prevent click-through/bubbling
 		view.originalPoint = point
 		view.point = point
@@ -43,8 +52,8 @@ class exports.ViewNavigationController extends Layer
 			animProperties = 
 				layer: previous.view
 				properties:
-					x: previous.view.originalPoint.x
-					y: previous.view.originalPoint.y
+					x: if previous.view.originalPoint? then previous.view.originalPoint.x else 0
+					y: if previous.view.originalPoint? then previous.view.originalPoint.y else 0
 
 			animation = new Animation animProperties
 			animation.options.curveOptions = previous.animation.options.curveOptions
