@@ -10,7 +10,7 @@ class exports.ViewNavigationController extends Layer
 		options.height ?= Screen.height
 		options.clip ?= true
 		options.initialViewName ?= 'initialView'
-		options.animationOptions ?= curve: "bezier-curve(.2, 1, .2, 1)", time: .6
+		options.animationOptions ?= curve: "cubic-bezier(0.19, 1, 0.22, 1)", time: .7
 		options.backgroundColor ?= "rgba(190,190,190,0.9)"
 		options.perspective ?= 1000
 
@@ -55,6 +55,7 @@ class exports.ViewNavigationController extends Layer
 					x: if previous.view.originalPoint? then previous.view.originalPoint.x else 0
 					y: if previous.view.originalPoint? then previous.view.originalPoint.y else 0
 					scale: 1
+					brightness: 100
 
 			animation = new Animation animProperties
 			animation.options.curveOptions = previous.animation.options.curveOptions
@@ -207,6 +208,22 @@ class exports.ViewNavigationController extends Layer
 				rotation: 0
 		@applyAnimation view, animProperties, animationOptions
 
+	iosPushInRight: (view, animationOptions = @animationOptions) ->
+		return unless @readyToAnimate view
+		move =
+			layer: @current
+			properties:
+				x: -(@width/5)
+				brightness: 90
+		_.extend move, animationOptions
+		moveOut = new Animation move
+		moveOut.start()
+
+		view.x = @width
+		animProperties =
+			properties:
+				x: if view.originalPoint? then view.originalPoint.x else 0
+		@applyAnimation view, animProperties, animationOptions
 
 	pushInRight: (view, animationOptions = @animationOptions) ->
 		return unless @readyToAnimate view

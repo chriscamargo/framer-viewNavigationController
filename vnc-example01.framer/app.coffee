@@ -4,8 +4,6 @@ Views = new ViewNavigationController
 	width: 500
 	height: 500
 	initialViewName: 'foobar'
-	animationOptions: # defaults for each transition
-		time: 0.6 
 Views.center()
 
 view1 = new Layer 
@@ -23,7 +21,7 @@ Utils.labelLayer view2, 'view2'
 # Switch view to set the initial state
 #Views.switchInstant view1
 # Set up transition on click
-view1.on Events.Click, -> Views.transition view2, 'up'
+view1.on Events.Click, -> Views.iosPushInRight view2
 # Go back in history and reverse the previous animation
 view2.on Events.Click, -> Views.back()
 
