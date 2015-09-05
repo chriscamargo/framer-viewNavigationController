@@ -69,273 +69,261 @@ class exports.ViewNavigationController extends Layer
 			backwards.on Events.AnimationEnd, =>
 				@current.bringToFront()
 
-	applyAnimation: (view, animProperties, animationOptions) ->
-		unless view is @current
-			obj = layer: view
-			_.extend obj, animProperties, animationOptions
-			animation = new Animation obj
-			animation.start()
-			@saveCurrentToHistory animation
-			@current = view
-			@current.bringToFront()
+	applyAnimation: (newView, incoming, animationOptions, outgoing = {}) ->
+		return unless @readyToAnimate newView
+		unless newView is @current
 
-	applyAnimation2: (view, animProperties, animationOptions) ->
-		return unless @readyToAnimate view
-		unless view is @current
-			_.extend view, animProperties.from
-			obj = 
-				layer: view
+			# Animate the current view
+			_.extend @current, outgoing.start
+			outgoingAnimation = 
+				layer: @current
 				properties: {}
-			_.extend obj.properties, animProperties.to
-			_.extend obj, animationOptions
-			animation = new Animation obj
+			_.extend outgoingAnimation.properties, outgoing.end
+			_.extend outgoingAnimation, animationOptions
+			animation = new Animation(outgoingAnimation)
 			animation.start()
+
+			# Animate the new view
+			_.extend newView, incoming.start
+			incomingAnimation = 
+				layer: newView
+				properties: {}
+			_.extend incomingAnimation.properties, incoming.end
+			_.extend incomingAnimation, animationOptions
+			animation = new Animation(incomingAnimation)
+			animation.start()
+
 			@saveCurrentToHistory animation
-			@current = view
+			@current = newView
 			@current.bringToFront()
 
 
 	### ANIMATIONS ###
 
-	switchInstant: (view) -> @fadeIn view, time: 0
+	switchInstant: (newView) -> @fadeIn newView, time: 0
 
 
-	slideInLeft: (view, animationOptions = @animationOptions) -> 
-		animationProperties =
-			from:
+	slideInLeft: (newView, animationOptions = @animationOptions) -> 
+		incoming =
+			start:
 				x: -@width
-			to:
-				x: if view.originalPoint? then view.originalPoint.x else 0
+			end:
+				x: if newView.originalPoint? then newView.originalPoint.x else 0
 
-		@applyAnimation2 view, animationProperties, animationOptions
+		@applyAnimation newView, incoming, animationOptions
 
-	slideInRight: (view, animationOptions = @animationOptions) -> 
-		animationProperties =
-			from:
+	slideInRight: (newView, animationOptions = @animationOptions) -> 
+		incoming =
+			start:
 				x: @width
-			to:
-				x: if view.originalPoint? then view.originalPoint.x else 0
+			end:
+				x: if newView.originalPoint? then newView.originalPoint.x else 0
 
-		@applyAnimation2 view, animationProperties, animationOptions
+		@applyAnimation newView, incoming, animationOptions
 
-	slideInDown: (view, animationOptions = @animationOptions) -> 
-		animationProperties =
-			from:
+	slideInDown: (newView, animationOptions = @animationOptions) -> 
+		incoming =
+			start:
 				y: -@height
 				x: 0
-			to:
-				y: if view.originalPoint? then view.originalPoint.y else 0
+			end:
+				y: if newView.originalPoint? then newView.originalPoint.y else 0
 
-		@applyAnimation2 view, animationProperties, animationOptions
+		@applyAnimation newView, incoming, animationOptions
 
-	slideInUp: (view, animationOptions = @animationOptions) ->
-		animationProperties =
-			from:
+	slideInUp: (newView, animationOptions = @animationOptions) ->
+		incoming =
+			start:
 				y: @height
 				x: 0
-			to:
-				y: if view.originalPoint? then view.originalPoint.y else 0
+			end:
+				y: if newView.originalPoint? then newView.originalPoint.y else 0
 
-		@applyAnimation2 view, animationProperties, animationOptions
+		@applyAnimation newView, incoming, animationOptions
 
-	fadeIn: (view, animationOptions = @animationOptions) ->
-		animationProperties =
-			from:
+	fadeIn: (newView, animationOptions = @animationOptions) ->
+		incoming =
+			start:
 				y: 0
 				x: 0
 				opacity: 0
-			to:
+			end:
 				opacity: 1
 
-		@applyAnimation2 view, animationProperties, animationOptions
+		@applyAnimation newView, incoming, animationOptions
 
-	crossDissolve: (view, animationOptions = @animationOptions) ->
-		@fadeIn view, animationOptions
+	crossDissolve: (newView, animationOptions = @animationOptions) ->
+		@fadeIn newView, animationOptions
 			
-	zoomIn: (view, animationOptions = @animationOptions) ->
-		animationProperties =
-			from:
+	zoomIn: (newView, animationOptions = @animationOptions) ->
+		incoming =
+			start:
 				x: 0
 				y: 0
 				scale: 0.8
 				opacity: 0
-			to:
+			end:
 				scale: 1
 				opacity: 1
 
-		@applyAnimation2 view, animationProperties, animationOptions
+		@applyAnimation newView, incoming, animationOptions
 
-	zoomedIn: (view, animationOptions = @animationOptions) ->
-		animationProperties =
-			from:
+	zoomedIn: (newView, animationOptions = @animationOptions) ->
+		incoming =
+			start:
 				x: 0
 				y: 0
 				scale: 1.5
 				opacity: 0
-			to:
+			end:
 				scale: 1
 				opacity: 1
+		@applyAnimation newView, incoming, animationOptions
 
-		@applyAnimation2 view, animationProperties, animationOptions
-
-	flipInRight: (view, animationOptions = @animationOptions) ->
-		animationProperties =
-			from:
+	flipInRight: (newView, animationOptions = @animationOptions) ->
+		incoming =
+			start:
 				x: @width/2
 				z: 800
 				rotationY: 100
-			to:
-				x: if view.originalPoint? then view.originalPoint.x else 0
+			end:
+				x: if newView.originalPoint? then newView.originalPoint.x else 0
 				rotationY: 0
 				z: 0
-		@applyAnimation2 view, animationProperties, animationOptions
+		@applyAnimation newView, incoming, animationOptions
 
-	flipInLeft: (view, animationOptions = @animationOptions) ->
-		animationProperties =
-			from:
+	flipInLeft: (newView, animationOptions = @animationOptions) ->
+		incoming =
+			start:
 				x: -@width/2
 				z: 800
 				rotationY: -100
-			to:
-				x: if view.originalPoint? then view.originalPoint.x else 0
+			end:
+				x: if newView.originalPoint? then newView.originalPoint.x else 0
 				rotationY: 0
 				z: 0
-		@applyAnimation2 view, animationProperties, animationOptions
+		@applyAnimation newView, incoming, animationOptions
 
-	flipInUp: (view, animationOptions = @animationOptions) ->
-		animationProperties =
-			from:
+	flipInUp: (newView, animationOptions = @animationOptions) ->
+		incoming =
+			start:
 				x: 0
 				z: 800
 				y: @height
 				rotationX: -100
-			to:
-				y: if view.originalPoint? then view.originalPoint.y else 0
+			end:
+				y: if newView.originalPoint? then newView.originalPoint.y else 0
 				rotationX: 0
 				z: 0
-
-		@applyAnimation2 view, animationProperties, animationOptions
+		@applyAnimation newView, incoming, animationOptions
 		
-	spinIn: (view, animationOptions = @animationOptions) ->
-
-		animationProperties =
-			from:
+	spinIn: (newView, animationOptions = @animationOptions) ->
+		incoming =
+			start:
 				x: 0
 				y: 0
 				rotation: 180
 				scale: 0.8
 				opacity: 0
-			to:
+			end:
 				scale: 1
 				opacity: 1
 				rotation: 0
+		@applyAnimation newView, incoming, animationOptions
 
-		@applyAnimation2 view, animationProperties, animationOptions
-
-	iosPushInRight: (view, animationOptions = @animationOptions) ->
-		return unless @readyToAnimate view
-		move =
-			layer: @current
-			properties:
+	iosPushInRight: (newView, animationOptions = @animationOptions) ->
+		outgoing =
+			start: {}
+			end:
 				x: -(@width/5)
 				brightness: 90
-		_.extend move, animationOptions
-		moveOut = new Animation move
-		moveOut.start()
+		incoming =
+			start:
+				x: @width
+			end:
+				x: if newView.originalPoint? then newView.originalPoint.x else 0
+		@applyAnimation newView, incoming, animationOptions, outgoing
 
-		view.x = @width
-		animProperties =
-			properties:
-				x: if view.originalPoint? then view.originalPoint.x else 0
-		@applyAnimation view, animProperties, animationOptions
-
-	pushInRight: (view, animationOptions = @animationOptions) ->
-		return unless @readyToAnimate view
-		move =
-			layer: @current
-			properties:
+	iosPushInLeft: (newView, animationOptions = @animationOptions) ->
+		outgoing =
+			start: {}
+			end:
+				x: +(@width/5)
+				brightness: 90
+		incoming =
+			start:
 				x: -@width
-		_.extend move, animationOptions
-		moveOut = new Animation move
-		moveOut.start()
+			end:
+				x: if newView.originalPoint? then newView.originalPoint.x else 0
+		@applyAnimation newView, incoming, animationOptions, outgoing
 
-		view.x = @width
-		animProperties =
-			properties:
-				x: if view.originalPoint? then view.originalPoint.x else 0
-		@applyAnimation view, animProperties, animationOptions
+	pushInRight: (newView, animationOptions = @animationOptions) ->
+		outgoing =
+			start: {}
+			end:
+				x: -@width
+		incoming =
+			start:
+				x: @width
+			end:
+				x: if newView.originalPoint? then newView.originalPoint.x else 0
+		@applyAnimation newView, incoming, animationOptions, outgoing
 
 	pushInLeft: (view, animationOptions = @animationOptions) ->
-		return unless @readyToAnimate view
-		move =
-			layer: @current
-			properties:
+		outgoing =
+			start: {}
+			end:
 				x: @width
-		_.extend move, animationOptions
-		moveOut = new Animation move
-		moveOut.start()
-
-		view.x = -@width
-		animProperties =
-			properties:
-				x: if view.originalPoint? then view.originalPoint.x else 0
-		@applyAnimation view, animProperties, animationOptions
+		incoming =
+			start:
+				x: -@width
+			end:
+				x: if newView.originalPoint? then newView.originalPoint.x else 0
+		@applyAnimation newView, incoming, animationOptions, outgoing
 
 	pushInUp: (view, animationOptions = @animationOptions) ->
-		return unless @readyToAnimate view
-		move =
-			layer: @current
-			properties:
+		outgoing =
+			start: {}
+			end:
 				y: -@height
-		_.extend move, animationOptions
-		moveOut = new Animation move
-		moveOut.start()
-
-		view.x = 0
-		view.y = @height
-		animProperties =
-			properties:
-				y: if view.originalPoint? then view.originalPoint.y else 0
-		@applyAnimation view, animProperties, animationOptions
-
-	pushInDown: (view, animationOptions = @animationOptions) ->
-		return unless @readyToAnimate view
-		move =
-			layer: @current
-			properties:
+		incoming =
+			start:
+				x: 0
 				y: @height
-		_.extend move, animationOptions
-		moveOut = new Animation move
-		moveOut.start()
-		
-		view.x = 0
-		view.y = -@height
-		animProperties =
-			properties:
+			end:
 				y: if view.originalPoint? then view.originalPoint.y else 0
-		@applyAnimation view, animProperties, animationOptions
+		@applyAnimation newView, incoming, animationOptions, outgoing
 
-	appleMail: (view, animationOptions = @animationOptions) ->
-		return unless @readyToAnimate view
-		move =
-			layer: @current
-			properties:
+	pushInDown: (newView, animationOptions = @animationOptions) ->
+		outgoing =
+			start: {}
+			end:
+				y: @height
+		incoming =
+			start:
+				x: 0
+				y: -@height
+			end:
+				y: if newView.originalPoint? then newView.originalPoint.y else 0
+		@applyAnimation newView, incoming, animationOptions, outgoing
+
+	appleMail: (newView, animationOptions = @animationOptions) ->
+		outgoing =
+			start: {}
+			end:
 				scale: 0.8
-		_.extend move, animationOptions
-		moveOut = new Animation move
-		moveOut.start()
-
-		view.y = @height
-		view.x = 0
-		animProperties =
-			properties:
-				y: if view.originalPoint? then view.originalPoint.y else 100
-		@applyAnimation view, animProperties, animationOptions
+		incoming =
+			start:
+				x: 0
+				y: @height
+			end:
+				y: if newView.originalPoint? then newView.originalPoint.y else 100
+		@applyAnimation newView, incoming, animationOptions, outgoing
 
 	# Backwards compatibility
-	transition: (view, direction = 'right') ->
+	transition: (newView, direction = 'right') ->
 		switch direction
-			when 'up' then @pushInDown view
-			when 'right' then @pushInRight view
-			when 'down' then @pushInUp view
-			when 'left' then @pushInLeft view
+			when 'up' then @pushInDown newView
+			when 'right' then @pushInRight newView
+			when 'down' then @pushInUp newView
+			when 'left' then @pushInLeft newView
