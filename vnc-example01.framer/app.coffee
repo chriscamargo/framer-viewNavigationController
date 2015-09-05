@@ -1,74 +1,44 @@
-{ViewNavigationController} = require "ViewNavigationController"
+{ViewNavigationController} = require 'ViewNavigationController'
 
-bg = new BackgroundLayer
+Views = new ViewNavigationController
+	width: 500
+	height: 500
+	initialViewName: 'foobar'
+	#clip: false
+Views.center()
 
-vnc = new ViewNavigationController
+view1 = new Layer 
+	width: Views.width, height: Views.height, name: 'foobar'
+	image: "http://bit.ly/1L86dhL", superLayer: Views, opacity: 0.8
+Utils.labelLayer view1, 'view1'
 
-# This is optional, but allows you to customize the transition
-vnc.animationOptions =
-	curve: "ease-in-out"
-	time: 0.3
+view2 = new Layer
+	width: Views.width, height: Views.height
+	image: "http://bit.ly/1UvvNCp", superLayer: Views
+Utils.labelLayer view2, 'view2'
 
-# # # # # # # # # # # # # # # # # # # # # # # #
-# VIEWS
-# # # # # # # # # # # # # # # # # # # # # # # #
-viewSettings = new Layer
-	name: "initialView"
-	width: 750, height: 1334
-	image: "images/screen_01_settings.png"
-	superLayer: vnc
+# Add views to the view controller
+#Views.add view for view in [view1,view2]
+# Switch view to set the initial state
+#Views.switchInstant view1
+# Set up transition on click
+view1.on Events.Click, -> Views.pushIn view2
+# Go back in history and reverse the previous animation
+view2.on Events.Click, -> Views.back()
 
-viewGeneral = new Layer
-	width: 750, height: 1334
-	image: "images/screen_02_general.png"
-	superLayer: vnc
-
-viewSiri = new Layer
-	width: 750, height: 1334
-	image: "images/screen_03_siri.png"
-	superLayer: vnc
-	
-viewUpdate = new Layer
-	width: 750, height: 1334
-	image: "images/screen_04_update.png"
-	superLayer: vnc
-
-# To remove the back button from a view, do this:
-# viewUpdate.backButton = false
-
-# # # # # # # # # # # # # # # # # # # # # # # #
-# BUTTONS
-# # # # # # # # # # # # # # # # # # # # # # # #
-btnGeneral = new Layer
-	width: Screen.width
-	height: 88
-	y: 1130
-	backgroundColor: "transparent"
-	superLayer: viewSettings
-	
-btnSiri = new Layer
-	width: Screen.width
-	height: 88
-	y: 444
-	backgroundColor: "transparent"
-	superLayer: viewGeneral
-	
-btnUpdate = new Layer
-	width: Screen.width
-	height: 88
-	y: 284
-	backgroundColor: "transparent"
-	superLayer: viewGeneral
-
-
-# # # # # # # # # # # # # # # # # # # # # # # #
-# EVENTS
-# # # # # # # # # # # # # # # # # # # # # # # #
-btnGeneral.on Events.Click, ->
-	vnc.transition viewGeneral
-	
-btnSiri.on Events.Click, ->
-	vnc.transition viewSiri
-
-btnUpdate.on Events.Click, ->
-	vnc.transition viewUpdate
+### Transitions
+.switchInstant
+.pushInRight
+.pushInLeft
+.slideInDown
+.slideInUp
+.slideInRight
+.slideInLeft
+.fadeIn
+.zoomIn
+.zoomedIn
+.flipInRight
+.flipInLeft
+.flipInUp
+.spinIn
+###

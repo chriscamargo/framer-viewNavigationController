@@ -1,187 +1,334 @@
+# TODO:
+# Add custom animationOptions to .back()?
+# Add "moveOut" animations? what's the use case? covered by back?
+# If no need for moveOut, maybe we wont need consistent "In" naming scheme
+
 class exports.ViewNavigationController extends Layer
+		
+	constructor: (options={}) ->
+		options.width ?= Screen.width
+		options.height ?= Screen.height
+		options.clip ?= true
+		options.initialViewName ?= 'initialView'
+		options.animationOptions ?= curve: "cubic-bezier(0.19, 1, 0.22, 1)", time: .7
+		options.backgroundColor ?= "black"
+		options.perspective ?= 1000
 
-	# Setup Class Constants
-	INITIAL_VIEW_NAME = "initialView"
-	BACKBUTTON_VIEW_NAME = "vnc-backButton"
-	ANIMATION_OPTIONS = 
-		time: 0.3
-		curve: "ease-in-out"
-	BACK_BUTTON_FRAME = 
-		x: 0
-		y: 40
-		width: 88
-		height: 88
-	PUSH =
-		UP:     "pushUp"
-		DOWN:   "pushDown"
-		LEFT:   "pushLeft"
-		RIGHT:  "pushRight"
-		CENTER: "pushCenter"
-	DIR =
-		UP:    "up"
-		DOWN:  "down"
-		LEFT:  "left"
-		RIGHT: "right"
-	DEBUG_MODE = false
-		
-	# Setup Instance and Instance Variables	
-	constructor: (@options={}) ->
-
-		@views = @history = @initialView = @currentView = @previousView = @animationOptions = @initialViewName = null
-		@options.width           ?= Screen.width
-		@options.height          ?= Screen.height
-		@options.clip            ?= true
-		@options.backgroundColor ?= "#999"
-		
-		super @options
-		
-		@views   = []
+		super options
 		@history = []
-		@animationOptions = @options.animationOptions or ANIMATION_OPTIONS
-		@initialViewName  = @options.initialViewName  or INITIAL_VIEW_NAME
-		@backButtonFrame  = @options.backButtonFrame  or BACK_BUTTON_FRAME
-		@debugMode        = @options.debugMode        or DEBUG_MODE
-		
-		@.on "change:subLayers", (changeList) ->
-			@addView subLayer, true for subLayer in changeList.added
+		@on "change:subLayers", (changeList) ->
+			if changeList.added[0].name is options.initialViewName
+				@switchInstant changeList.added[0]
+			else
+				changeList.added[0].x = @width
 
-	addView: (view, viaInternalChangeEvent) ->
-		
-		vncWidth  = @options.width
-		vncHeight = @options.height
-
-		view.states.add(
-			"#{ PUSH.UP }":
-				x: 0
-				y: -vncHeight
-			"#{ PUSH.LEFT }":
-				x: -vncWidth
-				y: 0
-			"#{ PUSH.CENTER }":
-				x: 0
-				y: 0
-			"#{ PUSH.RIGHT }":
-				x: vncWidth
-				y: 0
-			"#{ PUSH.DOWN }":
-				x: 0
-				y: vncHeight
-		)
-
-			
-		view.states.animationOptions = @animationOptions
-		
-		if view.name is @initialViewName
-			@initialView = view
-			@currentView = view
-			view.states.switchInstant PUSH.CENTER
-			@history.push view
+	add: (view, point = {x:0, y:0}, viaInternalChangeEvent = false) ->
+		if viaInternalChangeEvent
+			@switchInstant view
 		else
-			view.states.switchInstant PUSH.RIGHT
-		
-		unless view.superLayer is @ or viaInternalChangeEvent
 			view.superLayer = @
-			
-		@_applyBackButton view unless view.name is @initialViewName
-			
-		@views.push view
+		view.on Events.Click, -> return # prevent click-through/bubbling
+		view.originalPoint = point
+		view.point = point
 
-	transition: (view, direction = DIR.RIGHT, switchInstant = false, preventHistory = false) ->
-
-		return false if view is @currentView
-		
-		# Setup Views for the transition
-		
-		if direction is DIR.RIGHT
-			view.states.switchInstant  PUSH.RIGHT
-			@currentView.states.switch PUSH.LEFT
-		else if direction is DIR.DOWN
-			view.states.switchInstant  PUSH.DOWN
-			@currentView.states.switch PUSH.UP
-		else if direction is DIR.LEFT
-			view.states.switchInstant  PUSH.LEFT
-			@currentView.states.switch PUSH.RIGHT
-		else if direction is DIR.UP
-			view.states.switchInstant  PUSH.UP
-			@currentView.states.switch PUSH.DOWN
+	readyToAnimate: (view) ->
+		if view isnt @current
+			if @subLayers.indexOf(view) is -1
+				@add view
+			return true
 		else
-			# If they specified something different just switch immediately
-			view.states.switchInstant PUSH.CENTER
-			@currentView.states.switchInstant PUSH.LEFT
+			return false
+
 		
-		# Push view to Center
-		view.states.switch PUSH.CENTER
-		# currentView is now our previousView
-		@previousView = @currentView
-		# Set our currentView to the view we're bringing in
-		@currentView = view
+	saveCurrentToHistory: (animation) ->
+		@history.unshift
+			view: @current
+			animation: animation
 
-		# Store the last view in history
-		@history.push @previousView if preventHistory is false
-		
-		@emit Events.Change
+	back: -> 
+		previous = @history[0]
+		if previous.view?
 
-	removeBackButton: (view) ->
-		Utils.delay 0, =>
-			view.subLayersByName(BACKBUTTON_VIEW_NAME)[0].visible = false
+			animProperties = 
+				layer: previous.view
+				properties:
+					x: if previous.view.originalPoint? then previous.view.originalPoint.x else 0
+					y: if previous.view.originalPoint? then previous.view.originalPoint.y else 0
+					scale: 1
+					brightness: 100
 
-	back: () ->
-		@transition(@_getLastHistoryItem(), direction = DIR.LEFT, switchInstant = false, preventHistory = true)
-		@history.pop()
-
-	_getLastHistoryItem: () ->
-		return @history[@history.length - 1]
-
-	_applyBackButton: (view, frame = @backButtonFrame) ->
-		Utils.delay 0, =>
-			if view.backButton isnt false
-				backButton = new Layer
-					name: BACKBUTTON_VIEW_NAME
-					width: 80
-					height: 80
-					superLayer: view
-
-				if @debugMode is false
-					backButton.backgroundColor = "transparent"
-
-				backButton.frame = frame
-
-				backButton.on Events.Click, =>
-					@back()
-		
-    
-
-################################################################################
-# USAGE EXAMPLE 1 - Define InitialViewName #####################################
-
-# initialViewKey = "view1"
-# 
-# vnc = new ViewNavigationController initialViewName: initialViewKey
-# view1 = new Layer
-# 	name: initialViewKey
-# 	width:  Screen.width
-# 	height: Screen.height
-# 	backgroundColor: "red"
-# 	superLayer: vnc
-
-################################################################################
-# USAGE EXAMPLE 2 - Use default initialViewName "initialView" ##################
-
-# vnc = new ViewNavigationController
-
-# view1 = new Layer
-# 	name: "initialView"
-# 	width:  Screen.width
-# 	height: Screen.height
-# 	backgroundColor: "red"
-# 	superLayer: vnc
+			animation = new Animation animProperties
+			animation.options.curveOptions = previous.animation.options.curveOptions
+			animation.start()
 	
-# view2 = new Layer
-# 	width:  Screen.width
-# 	height: Screen.height
-# 	backgroundColor: "green"
-# 	superLayer: vnc
+			anim = previous.animation
+			backwards = anim.reverse()
+			backwards.start()
+			@current = previous.view
+			@history.shift()
+			backwards.on Events.AnimationEnd, =>
+				@current.bringToFront()
 
-# view1.on Events.Click, -> vnc.transition view2
-# view2.on Events.Click, -> vnc.back()
-	
+	applyAnimation: (newView, incoming, animationOptions, outgoing = {}) ->
+		return unless @readyToAnimate newView
+		unless newView is @current
+
+			# Animate the current view
+			_.extend @current, outgoing.start
+			outgoingAnimation = 
+				layer: @current
+				properties: {}
+			_.extend outgoingAnimation.properties, outgoing.end
+			_.extend outgoingAnimation, animationOptions
+			animation = new Animation(outgoingAnimation)
+			animation.start()
+
+			# Animate the new view
+			_.extend newView, incoming.start
+			incomingAnimation = 
+				layer: newView
+				properties: {}
+			_.extend incomingAnimation.properties, incoming.end
+			_.extend incomingAnimation, animationOptions
+			animation = new Animation(incomingAnimation)
+			animation.start()
+
+			@saveCurrentToHistory animation
+			@current = newView
+			@current.bringToFront()
+
+
+	### ANIMATIONS ###
+
+	switchInstant: (newView) -> @fadeIn newView, time: 0
+
+	slideIn: (newView, animationOptions = @animationOptions) -> 
+		@slideInRight newView, animationOptions
+
+	slideInLeft: (newView, animationOptions = @animationOptions) -> 
+		incoming =
+			start:
+				x: -@width
+			end:
+				x: if newView.originalPoint? then newView.originalPoint.x else 0
+		@applyAnimation newView, incoming, animationOptions
+
+	slideInRight: (newView, animationOptions = @animationOptions) -> 
+		incoming =
+			start:
+				x: @width
+			end:
+				x: if newView.originalPoint? then newView.originalPoint.x else 0
+		@applyAnimation newView, incoming, animationOptions
+
+	slideInDown: (newView, animationOptions = @animationOptions) -> 
+		incoming =
+			start:
+				y: -@height
+				x: 0
+			end:
+				y: if newView.originalPoint? then newView.originalPoint.y else 0
+		@applyAnimation newView, incoming, animationOptions
+
+	slideInUp: (newView, animationOptions = @animationOptions) ->
+		incoming =
+			start:
+				y: @height
+				x: 0
+			end:
+				y: if newView.originalPoint? then newView.originalPoint.y else 0
+		@applyAnimation newView, incoming, animationOptions
+
+	fadeIn: (newView, animationOptions = @animationOptions) ->
+		incoming =
+			start:
+				y: 0
+				x: 0
+				opacity: 0
+			end:
+				opacity: 1
+		@applyAnimation newView, incoming, animationOptions
+
+	crossDissolve: (newView, animationOptions = @animationOptions) ->
+		@fadeIn newView, animationOptions
+			
+	zoomIn: (newView, animationOptions = @animationOptions) ->
+		incoming =
+			start:
+				x: 0
+				y: 0
+				scale: 0.8
+				opacity: 0
+			end:
+				scale: 1
+				opacity: 1
+		@applyAnimation newView, incoming, animationOptions
+
+	zoomedIn: (newView, animationOptions = @animationOptions) ->
+		incoming =
+			start:
+				x: 0
+				y: 0
+				scale: 1.5
+				opacity: 0
+			end:
+				scale: 1
+				opacity: 1
+		@applyAnimation newView, incoming, animationOptions
+
+	flipIn: (newView, animationOptions = @animationOptions) -> 
+		@flipInRight newView, animationOptions
+
+	flipInRight: (newView, animationOptions = @animationOptions) ->
+		incoming =
+			start:
+				x: @width/2
+				z: 800
+				rotationY: 100
+			end:
+				x: if newView.originalPoint? then newView.originalPoint.x else 0
+				rotationY: 0
+				z: 0
+		@applyAnimation newView, incoming, animationOptions
+
+	flipInLeft: (newView, animationOptions = @animationOptions) ->
+		incoming =
+			start:
+				x: -@width/2
+				z: 800
+				rotationY: -100
+			end:
+				x: if newView.originalPoint? then newView.originalPoint.x else 0
+				rotationY: 0
+				z: 0
+		@applyAnimation newView, incoming, animationOptions
+
+	flipInUp: (newView, animationOptions = @animationOptions) ->
+		incoming =
+			start:
+				x: 0
+				z: 800
+				y: @height
+				rotationX: -100
+			end:
+				y: if newView.originalPoint? then newView.originalPoint.y else 0
+				rotationX: 0
+				z: 0
+		@applyAnimation newView, incoming, animationOptions
+		
+	spinIn: (newView, animationOptions = @animationOptions) ->
+		incoming =
+			start:
+				x: 0
+				y: 0
+				rotation: 180
+				scale: 0.8
+				opacity: 0
+			end:
+				scale: 1
+				opacity: 1
+				rotation: 0
+		@applyAnimation newView, incoming, animationOptions
+
+	pushIn: (newView, animationOptions = @animationOptions) -> 
+		@pushInRight newView, animationOptions
+
+	pushInRight: (newView, animationOptions = @animationOptions) ->
+		outgoing =
+			start: {}
+			end:
+				x: -(@width/5)
+				brightness: 90
+		incoming =
+			start:
+				x: @width
+			end:
+				x: if newView.originalPoint? then newView.originalPoint.x else 0
+		@applyAnimation newView, incoming, animationOptions, outgoing
+
+	pushInLeft: (newView, animationOptions = @animationOptions) ->
+		outgoing =
+			start: {}
+			end:
+				x: +(@width/5)
+				brightness: 90
+		incoming =
+			start:
+				x: -@width
+			end:
+				x: if newView.originalPoint? then newView.originalPoint.x else 0
+		@applyAnimation newView, incoming, animationOptions, outgoing
+
+	moveIn: (newView, animationOptions = @animationOptions) -> 
+		@moveInRight newView, animationOptions
+
+	moveInRight: (newView, animationOptions = @animationOptions) ->
+		outgoing =
+			start: {}
+			end:
+				x: -@width
+		incoming =
+			start:
+				x: @width
+			end:
+				x: if newView.originalPoint? then newView.originalPoint.x else 0
+		@applyAnimation newView, incoming, animationOptions, outgoing
+
+	moveInLeft: (newView, animationOptions = @animationOptions) ->
+		outgoing =
+			start: {}
+			end:
+				x: @width
+		incoming =
+			start:
+				x: -@width
+			end:
+				x: if newView.originalPoint? then newView.originalPoint.x else 0
+		@applyAnimation newView, incoming, animationOptions, outgoing
+
+	moveInUp: (newView, animationOptions = @animationOptions) ->
+		outgoing =
+			start: {}
+			end:
+				y: -@height
+		incoming =
+			start:
+				x: 0
+				y: @height
+			end:
+				y: if newView.originalPoint? then newView.originalPoint.y else 0
+		@applyAnimation newView, incoming, animationOptions, outgoing
+
+	moveInDown: (newView, animationOptions = @animationOptions) ->
+		outgoing =
+			start: {}
+			end:
+				y: @height
+		incoming =
+			start:
+				x: 0
+				y: -@height
+			end:
+				y: if newView.originalPoint? then newView.originalPoint.y else 0
+		@applyAnimation newView, incoming, animationOptions, outgoing
+
+	modal: (newView, animationOptions = @animationOptions) ->
+		outgoing =
+			start: {}
+			end:
+				scale: 0.9
+		incoming =
+			start:
+				x: 0
+				y: @height
+			end:
+				y: if newView.originalPoint? then newView.originalPoint.y else @height/10
+		@applyAnimation newView, incoming, animationOptions, outgoing
+
+	# Backwards compatibility
+	transition: (newView, direction = 'right') ->
+		switch direction
+			when 'up' then @pushInDown newView
+			when 'right' then @pushInRight newView
+			when 'down' then @pushInUp newView
+			when 'left' then @pushInLeft newView
