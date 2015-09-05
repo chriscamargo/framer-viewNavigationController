@@ -22,7 +22,7 @@ Utils.labelLayer view2, 'view2'
 # Switch view to set the initial state
 #Views.switchInstant view1
 # Set up transition on click
-view1.on Events.Click, -> Views.transition view2, 'right'
+view1.on Events.Click, -> Views.pushIn view2
 # Go back in history and reverse the previous animation
 view2.on Events.Click, -> Views.back()
 

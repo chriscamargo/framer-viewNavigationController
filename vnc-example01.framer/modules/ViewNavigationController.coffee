@@ -11,7 +11,7 @@ class exports.ViewNavigationController extends Layer
 		options.clip ?= true
 		options.initialViewName ?= 'initialView'
 		options.animationOptions ?= curve: "cubic-bezier(0.19, 1, 0.22, 1)", time: .7
-		options.backgroundColor ?= "rgba(190,190,190,0.9)"
+		options.backgroundColor ?= "black"
 		options.perspective ?= 1000
 
 		super options
@@ -102,6 +102,8 @@ class exports.ViewNavigationController extends Layer
 
 	switchInstant: (newView) -> @fadeIn newView, time: 0
 
+	slideIn: (newView, animationOptions = @animationOptions) -> 
+		@slideInRight newView, animationOptions
 
 	slideInLeft: (newView, animationOptions = @animationOptions) -> 
 		incoming =
@@ -109,7 +111,6 @@ class exports.ViewNavigationController extends Layer
 				x: -@width
 			end:
 				x: if newView.originalPoint? then newView.originalPoint.x else 0
-
 		@applyAnimation newView, incoming, animationOptions
 
 	slideInRight: (newView, animationOptions = @animationOptions) -> 
@@ -118,7 +119,6 @@ class exports.ViewNavigationController extends Layer
 				x: @width
 			end:
 				x: if newView.originalPoint? then newView.originalPoint.x else 0
-
 		@applyAnimation newView, incoming, animationOptions
 
 	slideInDown: (newView, animationOptions = @animationOptions) -> 
@@ -128,7 +128,6 @@ class exports.ViewNavigationController extends Layer
 				x: 0
 			end:
 				y: if newView.originalPoint? then newView.originalPoint.y else 0
-
 		@applyAnimation newView, incoming, animationOptions
 
 	slideInUp: (newView, animationOptions = @animationOptions) ->
@@ -138,7 +137,6 @@ class exports.ViewNavigationController extends Layer
 				x: 0
 			end:
 				y: if newView.originalPoint? then newView.originalPoint.y else 0
-
 		@applyAnimation newView, incoming, animationOptions
 
 	fadeIn: (newView, animationOptions = @animationOptions) ->
@@ -149,7 +147,6 @@ class exports.ViewNavigationController extends Layer
 				opacity: 0
 			end:
 				opacity: 1
-
 		@applyAnimation newView, incoming, animationOptions
 
 	crossDissolve: (newView, animationOptions = @animationOptions) ->
@@ -165,7 +162,6 @@ class exports.ViewNavigationController extends Layer
 			end:
 				scale: 1
 				opacity: 1
-
 		@applyAnimation newView, incoming, animationOptions
 
 	zoomedIn: (newView, animationOptions = @animationOptions) ->
@@ -179,6 +175,9 @@ class exports.ViewNavigationController extends Layer
 				scale: 1
 				opacity: 1
 		@applyAnimation newView, incoming, animationOptions
+
+	flipIn: (newView, animationOptions = @animationOptions) -> 
+		@flipInRight newView, animationOptions
 
 	flipInRight: (newView, animationOptions = @animationOptions) ->
 		incoming =
@@ -231,7 +230,10 @@ class exports.ViewNavigationController extends Layer
 				rotation: 0
 		@applyAnimation newView, incoming, animationOptions
 
-	iosPushInRight: (newView, animationOptions = @animationOptions) ->
+	pushIn: (newView, animationOptions = @animationOptions) -> 
+		@pushInRight newView, animationOptions
+
+	pushInRight: (newView, animationOptions = @animationOptions) ->
 		outgoing =
 			start: {}
 			end:
@@ -244,7 +246,7 @@ class exports.ViewNavigationController extends Layer
 				x: if newView.originalPoint? then newView.originalPoint.x else 0
 		@applyAnimation newView, incoming, animationOptions, outgoing
 
-	iosPushInLeft: (newView, animationOptions = @animationOptions) ->
+	pushInLeft: (newView, animationOptions = @animationOptions) ->
 		outgoing =
 			start: {}
 			end:
@@ -257,7 +259,10 @@ class exports.ViewNavigationController extends Layer
 				x: if newView.originalPoint? then newView.originalPoint.x else 0
 		@applyAnimation newView, incoming, animationOptions, outgoing
 
-	pushInRight: (newView, animationOptions = @animationOptions) ->
+	moveIn: (newView, animationOptions = @animationOptions) -> 
+		@moveInRight newView, animationOptions
+
+	moveInRight: (newView, animationOptions = @animationOptions) ->
 		outgoing =
 			start: {}
 			end:
@@ -269,7 +274,7 @@ class exports.ViewNavigationController extends Layer
 				x: if newView.originalPoint? then newView.originalPoint.x else 0
 		@applyAnimation newView, incoming, animationOptions, outgoing
 
-	pushInLeft: (view, animationOptions = @animationOptions) ->
+	moveInLeft: (newView, animationOptions = @animationOptions) ->
 		outgoing =
 			start: {}
 			end:
@@ -281,7 +286,7 @@ class exports.ViewNavigationController extends Layer
 				x: if newView.originalPoint? then newView.originalPoint.x else 0
 		@applyAnimation newView, incoming, animationOptions, outgoing
 
-	pushInUp: (view, animationOptions = @animationOptions) ->
+	moveInUp: (newView, animationOptions = @animationOptions) ->
 		outgoing =
 			start: {}
 			end:
@@ -291,10 +296,10 @@ class exports.ViewNavigationController extends Layer
 				x: 0
 				y: @height
 			end:
-				y: if view.originalPoint? then view.originalPoint.y else 0
+				y: if newView.originalPoint? then newView.originalPoint.y else 0
 		@applyAnimation newView, incoming, animationOptions, outgoing
 
-	pushInDown: (newView, animationOptions = @animationOptions) ->
+	moveInDown: (newView, animationOptions = @animationOptions) ->
 		outgoing =
 			start: {}
 			end:
@@ -307,17 +312,17 @@ class exports.ViewNavigationController extends Layer
 				y: if newView.originalPoint? then newView.originalPoint.y else 0
 		@applyAnimation newView, incoming, animationOptions, outgoing
 
-	appleMail: (newView, animationOptions = @animationOptions) ->
+	modal: (newView, animationOptions = @animationOptions) ->
 		outgoing =
 			start: {}
 			end:
-				scale: 0.8
+				scale: 0.9
 		incoming =
 			start:
 				x: 0
 				y: @height
 			end:
-				y: if newView.originalPoint? then newView.originalPoint.y else 100
+				y: if newView.originalPoint? then newView.originalPoint.y else @height/10
 		@applyAnimation newView, incoming, animationOptions, outgoing
 
 	# Backwards compatibility
