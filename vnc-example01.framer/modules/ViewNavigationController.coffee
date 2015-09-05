@@ -79,134 +79,158 @@ class exports.ViewNavigationController extends Layer
 			@current = view
 			@current.bringToFront()
 
+	applyAnimation2: (view, animProperties, animationOptions) ->
+		return unless @readyToAnimate view
+		unless view is @current
+			_.extend view, animProperties.from
+			obj = 
+				layer: view
+				properties: {}
+			_.extend obj.properties, animProperties.to
+			_.extend obj, animationOptions
+			animation = new Animation obj
+			animation.start()
+			@saveCurrentToHistory animation
+			@current = view
+			@current.bringToFront()
+
 
 	### ANIMATIONS ###
 
 	switchInstant: (view) -> @fadeIn view, time: 0
 
-	slideInDown: (view, animationOptions = @animationOptions) -> 
-		return unless @readyToAnimate view
 
-		view.y = -@height
-		animProperties =
-			properties:
+	slideInLeft: (view, animationOptions = @animationOptions) -> 
+		animationProperties =
+			from:
+				x: -@width
+			to:
+				x: if view.originalPoint? then view.originalPoint.x else 0
+
+		@applyAnimation2 view, animationProperties, animationOptions
+
+	slideInRight: (view, animationOptions = @animationOptions) -> 
+		animationProperties =
+			from:
+				x: @width
+			to:
+				x: if view.originalPoint? then view.originalPoint.x else 0
+
+		@applyAnimation2 view, animationProperties, animationOptions
+
+	slideInDown: (view, animationOptions = @animationOptions) -> 
+		animationProperties =
+			from:
+				y: -@height
+				x: 0
+			to:
 				y: if view.originalPoint? then view.originalPoint.y else 0
-		@applyAnimation view, animProperties, animationOptions
+
+		@applyAnimation2 view, animationProperties, animationOptions
 
 	slideInUp: (view, animationOptions = @animationOptions) ->
-		return unless @readyToAnimate view
-
-		view.y = @height
-		animProperties =
-			properties:
+		animationProperties =
+			from:
+				y: @height
+				x: 0
+			to:
 				y: if view.originalPoint? then view.originalPoint.y else 0
-		@applyAnimation view, animProperties, animationOptions
 
-	slideInRight: (view, animationOptions = @animationOptions) ->
-		return unless @readyToAnimate view
-
-		view.x = @width
-		animProperties =
-			properties:
-				x: if view.originalPoint? then view.originalPoint.x else 0
-		@applyAnimation view, animProperties, animationOptions
-
-	slideInLeft: (view, animationOptions = @animationOptions) ->
-		return unless @readyToAnimate view
-
-		view.x = -@width
-		animProperties =
-			properties:
-				x: if view.originalPoint? then view.originalPoint.x else 0
-		@applyAnimation view, animProperties, animationOptions
+		@applyAnimation2 view, animationProperties, animationOptions
 
 	fadeIn: (view, animationOptions = @animationOptions) ->
-		return unless @readyToAnimate view
-
-		view.opacity = 0
-		view.x = 0
-		view.y = 0
-		animProperties =
-			properties:
+		animationProperties =
+			from:
+				y: 0
+				x: 0
+				opacity: 0
+			to:
 				opacity: 1
-		@applyAnimation view, animProperties, animationOptions
+
+		@applyAnimation2 view, animationProperties, animationOptions
 
 	crossDissolve: (view, animationOptions = @animationOptions) ->
 		@fadeIn view, animationOptions
 			
 	zoomIn: (view, animationOptions = @animationOptions) ->
-		return unless @readyToAnimate view
-
-		view.scale = 0.8
-		view.opacity = 0
-		animProperties =
-			properties:
+		animationProperties =
+			from:
+				x: 0
+				y: 0
+				scale: 0.8
+				opacity: 0
+			to:
 				scale: 1
 				opacity: 1
-		@applyAnimation view, animProperties, animationOptions
+
+		@applyAnimation2 view, animationProperties, animationOptions
 
 	zoomedIn: (view, animationOptions = @animationOptions) ->
-		return unless @readyToAnimate view
-
-		view.scale = 1.5
-		view.opacity = 0
-		animProperties =
-			properties:
+		animationProperties =
+			from:
+				x: 0
+				y: 0
+				scale: 1.5
+				opacity: 0
+			to:
 				scale: 1
 				opacity: 1
-		@applyAnimation view, animProperties, animationOptions
+
+		@applyAnimation2 view, animationProperties, animationOptions
 
 	flipInRight: (view, animationOptions = @animationOptions) ->
-		return unless @readyToAnimate view
-
-		view.x = @width/2
-		view.rotationY = 100
-		view.z = 800
-		animProperties =
-			properties:
+		animationProperties =
+			from:
+				x: @width/2
+				z: 800
+				rotationY: 100
+			to:
 				x: if view.originalPoint? then view.originalPoint.x else 0
 				rotationY: 0
 				z: 0
-		@applyAnimation view, animProperties, animationOptions
+		@applyAnimation2 view, animationProperties, animationOptions
 
 	flipInLeft: (view, animationOptions = @animationOptions) ->
-		return unless @readyToAnimate view
-
-		view.x = -@width/2
-		view.rotationY = -100
-		view.z = 800
-		animProperties =
-			properties:
+		animationProperties =
+			from:
+				x: -@width/2
+				z: 800
+				rotationY: -100
+			to:
 				x: if view.originalPoint? then view.originalPoint.x else 0
 				rotationY: 0
 				z: 0
-		@applyAnimation view, animProperties, animationOptions
+		@applyAnimation2 view, animationProperties, animationOptions
 
 	flipInUp: (view, animationOptions = @animationOptions) ->
-		return unless @readyToAnimate view
-
-		view.y = @height
-		view.rotationX = -100
-		view.z = 800
-		animProperties =
-			properties:
+		animationProperties =
+			from:
+				x: 0
+				z: 800
+				y: @height
+				rotationX: -100
+			to:
 				y: if view.originalPoint? then view.originalPoint.y else 0
 				rotationX: 0
 				z: 0
-		@applyAnimation view, animProperties, animationOptions
+
+		@applyAnimation2 view, animationProperties, animationOptions
 		
 	spinIn: (view, animationOptions = @animationOptions) ->
-		return unless @readyToAnimate view
 
-		view.opacity = 0
-		view.scale = 0.8
-		view.rotation = 180
-		animProperties =
-			properties:
-				opacity: 1
+		animationProperties =
+			from:
+				x: 0
+				y: 0
+				rotation: 180
+				scale: 0.8
+				opacity: 0
+			to:
 				scale: 1
+				opacity: 1
 				rotation: 0
-		@applyAnimation view, animProperties, animationOptions
+
+		@applyAnimation2 view, animationProperties, animationOptions
 
 	iosPushInRight: (view, animationOptions = @animationOptions) ->
 		return unless @readyToAnimate view
