@@ -30,15 +30,6 @@ class exports.ViewNavigationController extends Layer
 		view.on Events.Click, -> return # prevent click-through/bubbling
 		view.originalPoint = point
 		view.point = point
-
-	readyToAnimate: (view) ->
-		if view isnt @current
-			if @subLayers.indexOf(view) is -1
-				@add view
-			return true
-		else
-			return false
-
 		
 	saveCurrentToHistory: (animation) ->
 		@history.unshift
@@ -70,8 +61,10 @@ class exports.ViewNavigationController extends Layer
 				@current.bringToFront()
 
 	applyAnimation: (newView, incoming, animationOptions, outgoing = {}) ->
-		return unless @readyToAnimate newView
 		unless newView is @current
+
+			if @subLayers.indexOf(newView) is -1
+				@add newView
 
 			# Animate the current view
 			_.extend @current, outgoing.start
@@ -347,7 +340,7 @@ class exports.ViewNavigationController extends Layer
 	# Backwards compatibility
 	transition: (newView, direction = 'right') ->
 		switch direction
-			when 'up' then @pushInDown newView
+			when 'up' then @moveInDown newView
 			when 'right' then @pushInRight newView
-			when 'down' then @pushInUp newView
+			when 'down' then @moveInUp newView
 			when 'left' then @pushInLeft newView
