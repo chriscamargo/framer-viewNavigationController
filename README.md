@@ -36,6 +36,7 @@ to the top of your project
 - .slideInDown 
 - .slideInUp 
 - .fadeIn / .crossDissolve 
+- .fadeInBlack
 - .zoomIn 
 - .zoomedIn
 - .flipIn / .flipInRight 

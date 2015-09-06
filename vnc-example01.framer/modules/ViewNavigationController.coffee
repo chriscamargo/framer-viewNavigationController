@@ -151,6 +151,23 @@ class exports.ViewNavigationController extends Layer
 
 	crossDissolve: (newView, animationOptions = @animationOptions) ->
 		@fadeIn newView, animationOptions
+
+	fadeInBlack: (newView, animationOptions = @animationOptions) ->
+		outgoing =
+			start: 
+				brightness: 100
+			end:
+				brightness: 0
+		incoming =
+			start: 
+				opacity: 0
+				brightness: 0
+				x: if newView.originalPoint? then newView.originalPoint.x else 0
+				y: if newView.originalPoint? then newView.originalPoint.y else 0
+			end:
+				opacity: 1
+				brightness: 100
+		@applyAnimation newView, incoming, animationOptions, outgoing
 			
 	zoomIn: (newView, animationOptions = @animationOptions) ->
 		incoming =
@@ -311,6 +328,8 @@ class exports.ViewNavigationController extends Layer
 			end:
 				y: if newView.originalPoint? then newView.originalPoint.y else 0
 		@applyAnimation newView, incoming, animationOptions, outgoing
+
+
 
 	modal: (newView, animationOptions = @animationOptions) ->
 		outgoing =
