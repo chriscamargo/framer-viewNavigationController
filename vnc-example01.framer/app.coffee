@@ -15,15 +15,16 @@ view2 = new Layer
 	width: Views.width, height: Views.height
 	image: "http://bit.ly/1UvvNCp", superLayer: Views
 Utils.labelLayer view2, 'view2'
+
 # Add views to the view controller
 #Views.add view for view in [view1,view2]
 # Switch view to set the initial state
 #Views.switchInstant view1
 # Set up transition on click
-view1.on Events.Click, -> Views.pushIn view2
+view1.on Events.Click, -> Views.flipInRight view2
 
 # Go back in history and reverse the previous animation
-view2.on Events.Click, -> Views.back()
+view2.on Events.Click, -> Views.pushIn view1
 
 ### Transitions
 .switchInstant

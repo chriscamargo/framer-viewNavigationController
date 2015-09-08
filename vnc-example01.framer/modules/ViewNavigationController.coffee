@@ -30,6 +30,7 @@ class exports.ViewNavigationController extends Layer
 		view.on Events.Click, -> return # prevent click-through/bubbling
 		view.originalPoint = point
 		view.point = point
+		view.sendToBack()
 		
 	saveCurrentToHistory: (animation) ->
 		@history.unshift
@@ -63,8 +64,14 @@ class exports.ViewNavigationController extends Layer
 	applyAnimation: (newView, incoming, animationOptions, outgoing = {}) ->
 		unless newView is @current
 
-			if @subLayers.indexOf(newView) is -1
-				@add newView
+			# reset common properties in case they
+			# were changed during last animation
+			#@current.z = 0
+			newView.opacity = 1
+			newView.brightness = 100
+			newView.scale = 1
+
+			@add newView if @subLayers.indexOf(newView) is -1
 
 			# Animate the current view
 			_.extend @current, outgoing.start
@@ -90,6 +97,7 @@ class exports.ViewNavigationController extends Layer
 			@current = newView
 			@current.bringToFront()
 
+	getPoint: (view, point) -> view.originalPoint || {x:0,y:0}
 
 	### ANIMATIONS ###
 
@@ -103,7 +111,7 @@ class exports.ViewNavigationController extends Layer
 			start:
 				x: -@width
 			end:
-				x: if newView.originalPoint? then newView.originalPoint.x else 0
+				x: @getPoint(newView).x
 		@applyAnimation newView, incoming, animationOptions
 
 	slideInRight: (newView, animationOptions = @animationOptions) -> 
@@ -111,7 +119,7 @@ class exports.ViewNavigationController extends Layer
 			start:
 				x: @width
 			end:
-				x: if newView.originalPoint? then newView.originalPoint.x else 0
+				x: @getPoint(newView).x
 		@applyAnimation newView, incoming, animationOptions
 
 	slideInDown: (newView, animationOptions = @animationOptions) -> 
@@ -120,7 +128,7 @@ class exports.ViewNavigationController extends Layer
 				y: -@height
 				x: 0
 			end:
-				y: if newView.originalPoint? then newView.originalPoint.y else 0
+				y: @getPoint(newView).y
 		@applyAnimation newView, incoming, animationOptions
 
 	slideInUp: (newView, animationOptions = @animationOptions) ->
@@ -129,14 +137,14 @@ class exports.ViewNavigationController extends Layer
 				y: @height
 				x: 0
 			end:
-				y: if newView.originalPoint? then newView.originalPoint.y else 0
+				y: @getPoint(newView).y
 		@applyAnimation newView, incoming, animationOptions
 
 	fadeIn: (newView, animationOptions = @animationOptions) ->
 		incoming =
 			start:
-				y: 0
-				x: 0
+				x: @getPoint(newView).x
+				y: @getPoint(newView).y
 				opacity: 0
 			end:
 				opacity: 1
@@ -155,8 +163,8 @@ class exports.ViewNavigationController extends Layer
 			start: 
 				opacity: 0
 				brightness: 0
-				x: if newView.originalPoint? then newView.originalPoint.x else 0
-				y: if newView.originalPoint? then newView.originalPoint.y else 0
+				x: @getPoint(newView).x
+				y: @getPoint(newView).y
 			end:
 				opacity: 1
 				brightness: 100
@@ -196,7 +204,7 @@ class exports.ViewNavigationController extends Layer
 				z: 800
 				rotationY: 100
 			end:
-				x: if newView.originalPoint? then newView.originalPoint.x else 0
+				x: @getPoint(newView).x
 				rotationY: 0
 				z: 0
 		@applyAnimation newView, incoming, animationOptions
@@ -208,7 +216,7 @@ class exports.ViewNavigationController extends Layer
 				z: 800
 				rotationY: -100
 			end:
-				x: if newView.originalPoint? then newView.originalPoint.x else 0
+				x: @getPoint(newView).x
 				rotationY: 0
 				z: 0
 		@applyAnimation newView, incoming, animationOptions
@@ -221,7 +229,7 @@ class exports.ViewNavigationController extends Layer
 				y: @height
 				rotationX: -100
 			end:
-				y: if newView.originalPoint? then newView.originalPoint.y else 0
+				y: @getPoint(newView).y
 				rotationX: 0
 				z: 0
 		@applyAnimation newView, incoming, animationOptions
@@ -248,12 +256,13 @@ class exports.ViewNavigationController extends Layer
 			start: {}
 			end:
 				x: -(@width/5)
-				brightness: 90
+				brightness: 80
 		incoming =
 			start:
+				brightness: 100
 				x: @width
 			end:
-				x: if newView.originalPoint? then newView.originalPoint.x else 0
+				x: @getPoint(newView).x
 		@applyAnimation newView, incoming, animationOptions, outgoing
 
 	pushInLeft: (newView, animationOptions = @animationOptions) ->
@@ -266,7 +275,7 @@ class exports.ViewNavigationController extends Layer
 			start:
 				x: -@width
 			end:
-				x: if newView.originalPoint? then newView.originalPoint.x else 0
+				x: @getPoint(newView).x
 		@applyAnimation newView, incoming, animationOptions, outgoing
 
 	moveIn: (newView, animationOptions = @animationOptions) -> 
@@ -281,7 +290,7 @@ class exports.ViewNavigationController extends Layer
 			start:
 				x: @width
 			end:
-				x: if newView.originalPoint? then newView.originalPoint.x else 0
+				x: @getPoint(newView).x
 		@applyAnimation newView, incoming, animationOptions, outgoing
 
 	moveInLeft: (newView, animationOptions = @animationOptions) ->
@@ -293,7 +302,7 @@ class exports.ViewNavigationController extends Layer
 			start:
 				x: -@width
 			end:
-				x: if newView.originalPoint? then newView.originalPoint.x else 0
+				x: @getPoint(newView).x
 		@applyAnimation newView, incoming, animationOptions, outgoing
 
 	moveInUp: (newView, animationOptions = @animationOptions) ->
@@ -306,7 +315,7 @@ class exports.ViewNavigationController extends Layer
 				x: 0
 				y: @height
 			end:
-				y: if newView.originalPoint? then newView.originalPoint.y else 0
+				y: @getPoint(newView).y
 		@applyAnimation newView, incoming, animationOptions, outgoing
 
 	moveInDown: (newView, animationOptions = @animationOptions) ->
@@ -319,10 +328,8 @@ class exports.ViewNavigationController extends Layer
 				x: 0
 				y: -@height
 			end:
-				y: if newView.originalPoint? then newView.originalPoint.y else 0
+				y: @getPoint(newView).y
 		@applyAnimation newView, incoming, animationOptions, outgoing
-
-
 
 	modal: (newView, animationOptions = @animationOptions) ->
 		outgoing =
