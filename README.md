@@ -3,10 +3,11 @@ A simple controller for FramerJS that allows you to transition between views wit
 
 #### Features
 - Built in method for transitioning between views.
-- Multiple animations (fade, slide, flip + more)
+- Multiple transitions built in (fade, slide, flip + more)
 - Customize the movement by providing animationOptions
 - Automatically saves history when switching view
 - Automatically plays the transition backwards when calling .back()
+- Magic move! Layers sharing the same name will tween between its .frame values.
 
 #### Setup
 - add the module your modules folder and add
@@ -26,6 +27,7 @@ to the top of your project
 - Add interactivity
 
 	myLayer.on Events.Click, -> Views.pushIn mySecondLayer
+	mySecondLayer.on Events.Click, -> Views.magicMove myThirdLayer
 
 
 ### Supported transitions
@@ -50,3 +52,4 @@ to the top of your project
 - .moveInUp
 - .moveInDown 
 - .modal
+- .magicMove

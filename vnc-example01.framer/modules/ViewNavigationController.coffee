@@ -201,7 +201,7 @@ class exports.ViewNavigationController extends Layer
 		incoming =
 			start:
 				x: @width/2
-				z: 800
+				z: @width
 				rotationY: 100
 			end:
 				x: @getPoint(newView).x
@@ -213,7 +213,7 @@ class exports.ViewNavigationController extends Layer
 		incoming =
 			start:
 				x: -@width/2
-				z: 800
+				z: @width
 				rotationY: -100
 			end:
 				x: @getPoint(newView).x
@@ -225,7 +225,7 @@ class exports.ViewNavigationController extends Layer
 		incoming =
 			start:
 				x: 0
-				z: 800
+				z: @height
 				y: @height
 				rotationX: -100
 			end:
@@ -343,6 +343,46 @@ class exports.ViewNavigationController extends Layer
 			end:
 				y: if newView.originalPoint? then newView.originalPoint.y else @height/10
 		@applyAnimation newView, incoming, animationOptions, outgoing
+
+	magicMove: (newView, animationOptions = @animationOptions) ->
+
+		traverseSubLayers = (layer) ->
+			arr = []
+			findSubLayer = (layer) ->
+				for subLayer in layer.subLayers
+					arr.push subLayer
+					if subLayer.subLayers.length > 0
+						findSubLayer subLayer
+				return arr
+			findSubLayer layer
+		
+		exisitingLayers = {}
+		for sub in traverseSubLayers @current
+			exisitingLayers[sub.name] = sub
+		
+		# proper switch with history support
+		@switchInstant newView
+		
+		# fancy animations with magic move
+		for sub in traverseSubLayers newView
+			if exisitingLayers[sub.name]?
+				match = exisitingLayers[sub.name]
+				newFrame = sub.frame
+				prevFrame = match.frame
+				sub.frame = prevFrame
+				animationObj = 
+					properties:
+						x: newFrame.x
+						y: newFrame.y
+						width: newFrame.width
+						height: newFrame.height
+			else # fade in
+				sub.opacity = 0
+				animationObj = 
+					properties:
+						opacity: 1
+			_.extend animationObj, animationOptions
+			sub.animate animationObj
 
 	# Backwards compatibility
 	transition: (newView, direction = 'right') ->
