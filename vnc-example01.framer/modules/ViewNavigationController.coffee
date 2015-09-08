@@ -40,7 +40,8 @@ class exports.ViewNavigationController extends Layer
 		@animationOptions = @options.animationOptions or ANIMATION_OPTIONS
 		@initialViewName  = @options.initialViewName  or INITIAL_VIEW_NAME
 		@backButtonFrame  = @options.backButtonFrame  or BACK_BUTTON_FRAME
-		@debugMode        = @options.debugMode        or DEBUG_MODE
+
+		@debugMode = if @options.debugMode? then @options.debugMode else DEBUG_MODE
 		
 		@.on "change:subLayers", (changeList) ->
 			@addView subLayer, true for subLayer in changeList.added
