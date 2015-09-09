@@ -369,6 +369,9 @@ class exports.ViewNavigationController extends Layer
 				match = exisitingLayers[sub.name]
 				newFrame = sub.frame
 				prevFrame = match.frame
+				if prevFrame.width > newFrame.width # use largest image during animation
+					sub.originalImage = sub.image
+					sub.image = match.image
 				sub.frame = prevFrame
 				animationObj = 
 					properties:
@@ -376,13 +379,19 @@ class exports.ViewNavigationController extends Layer
 						y: newFrame.y
 						width: newFrame.width
 						height: newFrame.height
+				_.extend animationObj, animationOptions
+				transition = sub.animate animationObj
+				transition.on Events.AnimationEnd, ->
+					sub = this._target
+					if sub.originalImage?
+						sub.image = sub.originalImage
 			else # fade in
 				sub.opacity = 0
 				animationObj = 
 					properties:
 						opacity: 1
-			_.extend animationObj, animationOptions
-			sub.animate animationObj
+				_.extend animationObj, animationOptions
+				sub.animate animationObj
 
 	# Backwards compatibility
 	transition: (newView, direction = 'right') ->
