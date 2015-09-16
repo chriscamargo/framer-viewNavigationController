@@ -16,13 +16,10 @@ A simple controller for FramerJS that allows you to transition between views wit
 
 to the top of your project
 
-- Create a new instance of the controller
+- Create a new instance of the controller and set the initial view
 
 	Views = new ViewNavigationController
-
-- Set the initial view by calling one of the transition methods
-
-	Views.switchInstant myLayer
+		initialView: myLayer
 
 - Add interactivity
 

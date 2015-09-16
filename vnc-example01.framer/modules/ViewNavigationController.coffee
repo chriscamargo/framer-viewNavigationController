@@ -21,6 +21,8 @@ class exports.ViewNavigationController extends Layer
 				@switchInstant changeList.added[0]
 			else
 				changeList.added[0].x = @width
+		if options.initialView?
+			@switchInstant options.initialView
 
 	add: (view, point = {x:0, y:0}, viaInternalChangeEvent = false) ->
 		if viaInternalChangeEvent
