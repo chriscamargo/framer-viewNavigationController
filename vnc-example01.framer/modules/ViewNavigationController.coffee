@@ -32,33 +32,30 @@ class exports.ViewNavigationController extends Layer
 		view.point = point
 		view.sendToBack()
 		
-	saveCurrentToHistory: (animation) ->
+	saveCurrentToHistory: (incomingAnimation,outgoingAnimation) ->
 		@history.unshift
 			view: @current
-			animation: animation
+			incomingAnimation: incomingAnimation
+			outgoingAnimation: outgoingAnimation
 
 	back: -> 
 		previous = @history[0]
 		if previous.view?
 
-			animProperties = 
-				layer: previous.view
-				properties:
-					x: if previous.view.originalPoint? then previous.view.originalPoint.x else 0
-					y: if previous.view.originalPoint? then previous.view.originalPoint.y else 0
-					scale: 1
-					brightness: 100
+			backIn = previous.outgoingAnimation.reverse()
+			moveOut = previous.incomingAnimation.reverse()
 
-			animation = new Animation animProperties
-			animation.options.curveOptions = previous.animation.options.curveOptions
-			animation.start()
-	
-			anim = previous.animation
-			backwards = anim.reverse()
-			backwards.start()
+			# Switch which animation that should carry the delay, if any
+			moveOutDelay = moveOut.options.delay
+			moveOut.options.delay = backIn.options.delay
+			backIn.options.delay = moveOutDelay
+
+			backIn.start()
+			moveOut.start()
+
 			@current = previous.view
 			@history.shift()
-			backwards.on Events.AnimationEnd, =>
+			moveOut.on Events.AnimationEnd, =>
 				@current.bringToFront()
 
 	applyAnimation: (newView, incoming, animationOptions, outgoing = {}) ->
@@ -67,33 +64,35 @@ class exports.ViewNavigationController extends Layer
 			# reset common properties in case they
 			# were changed during last animation
 			#@current.z = 0
-			newView.opacity = 1
 			newView.brightness = 100
+			newView.opacity = 1
 			newView.scale = 1
 
 			@add newView if @subLayers.indexOf(newView) is -1
 
 			# Animate the current view
 			_.extend @current, outgoing.start
-			outgoingAnimation = 
+			outgoingAnimationObject = 
 				layer: @current
 				properties: {}
-			_.extend outgoingAnimation.properties, outgoing.end
-			_.extend outgoingAnimation, animationOptions
-			animation = new Animation(outgoingAnimation)
-			animation.start()
+			outgoingAnimationObject.delay = outgoing.delay
+			_.extend outgoingAnimationObject.properties, outgoing.end
+			_.extend outgoingAnimationObject, animationOptions
+			outgoingAnimation = new Animation(outgoingAnimationObject)
+			outgoingAnimation.start()
 
 			# Animate the new view
 			_.extend newView, incoming.start
-			incomingAnimation = 
+			incomingAnimationObject = 
 				layer: newView
 				properties: {}
-			_.extend incomingAnimation.properties, incoming.end
-			_.extend incomingAnimation, animationOptions
-			animation = new Animation(incomingAnimation)
-			animation.start()
+			incomingAnimationObject.delay = incoming.delay
+			_.extend incomingAnimationObject.properties, incoming.end
+			_.extend incomingAnimationObject, animationOptions
+			incomingAnimation = new Animation(incomingAnimationObject)
+			incomingAnimation.start()
 
-			@saveCurrentToHistory animation
+			@saveCurrentToHistory incomingAnimation, outgoingAnimation
 			@current = newView
 			@current.bringToFront()
 
@@ -154,20 +153,23 @@ class exports.ViewNavigationController extends Layer
 		@fadeIn newView, animationOptions
 
 	fadeInBlack: (newView, animationOptions = @animationOptions) ->
+		midAnimationTime = 
 		outgoing =
-			start: 
+			start:
 				brightness: 100
 			end:
 				brightness: 0
+			delay: 0
 		incoming =
-			start: 
-				opacity: 0
+			start:
 				brightness: 0
+				opacity: 0
 				x: @getPoint(newView).x
 				y: @getPoint(newView).y
 			end:
-				opacity: 1
 				brightness: 100
+				opacity: 1
+			delay: animationOptions.time/1.5
 		@applyAnimation newView, incoming, animationOptions, outgoing
 			
 	zoomIn: (newView, animationOptions = @animationOptions) ->
@@ -369,9 +371,6 @@ class exports.ViewNavigationController extends Layer
 				match = exisitingLayers[sub.name]
 				newFrame = sub.frame
 				prevFrame = match.frame
-				if prevFrame.width > newFrame.width # use largest image during animation
-					sub.originalImage = sub.image
-					sub.image = match.image
 				sub.frame = prevFrame
 				animationObj = 
 					properties:
@@ -379,19 +378,14 @@ class exports.ViewNavigationController extends Layer
 						y: newFrame.y
 						width: newFrame.width
 						height: newFrame.height
-				_.extend animationObj, animationOptions
-				transition = sub.animate animationObj
-				transition.on Events.AnimationEnd, ->
-					sub = this._target
-					if sub.originalImage?
-						sub.image = sub.originalImage
-			else # fade in
+						opacity: 1
+			else # fade in new layers
 				sub.opacity = 0
 				animationObj = 
 					properties:
 						opacity: 1
-				_.extend animationObj, animationOptions
-				sub.animate animationObj
+			_.extend animationObj, animationOptions
+			sub.animate animationObj
 
 	# Backwards compatibility
 	transition: (newView, direction = 'right') ->
