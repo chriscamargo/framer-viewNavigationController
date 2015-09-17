@@ -21,8 +21,6 @@ class exports.ViewNavigationController extends Layer
 				@switchInstant changeList.added[0]
 			else
 				changeList.added[0].x = @width
-		if options.initialView?
-			@switchInstant options.initialView
 
 	add: (view, point = {x:0, y:0}, viaInternalChangeEvent = false) ->
 		if viaInternalChangeEvent
@@ -44,21 +42,24 @@ class exports.ViewNavigationController extends Layer
 		previous = @history[0]
 		if previous.view?
 
-			backIn = previous.outgoingAnimation.reverse()
-			moveOut = previous.incomingAnimation.reverse()
+			if previous.incomingAnimation is 'magicMove'
+				return @magicMove previous.view
+			else
+				backIn = previous.outgoingAnimation.reverse()
+				moveOut = previous.incomingAnimation.reverse()
 
-			# Switch which animation that should carry the delay, if any
-			moveOutDelay = moveOut.options.delay
-			moveOut.options.delay = backIn.options.delay
-			backIn.options.delay = moveOutDelay
+				# Switch which animation that should carry the delay, if any
+				moveOutDelay = moveOut.options.delay
+				moveOut.options.delay = backIn.options.delay
+				backIn.options.delay = moveOutDelay
 
-			backIn.start()
-			moveOut.start()
+				backIn.start()
+				moveOut.start()
 
-			@current = previous.view
-			@history.shift()
-			moveOut.on Events.AnimationEnd, =>
-				@current.bringToFront()
+				@current = previous.view
+				@history.shift()
+				moveOut.on Events.AnimationEnd, =>
+					@current.bringToFront()
 
 	applyAnimation: (newView, incoming, animationOptions, outgoing = {}) ->
 		unless newView is @current
@@ -74,7 +75,7 @@ class exports.ViewNavigationController extends Layer
 
 			# Animate the current view
 			_.extend @current, outgoing.start
-			outgoingAnimationObject = 
+			outgoingAnimationObject =
 				layer: @current
 				properties: {}
 			outgoingAnimationObject.delay = outgoing.delay
@@ -365,7 +366,12 @@ class exports.ViewNavigationController extends Layer
 			exisitingLayers[sub.name] = sub
 		
 		# proper switch with history support
-		@switchInstant newView
+		newView.x = @getPoint(newView).x
+		newView.y = @getPoint(newView).y
+		@add newView if @subLayers.indexOf(newView) is -1
+		@saveCurrentToHistory 'magicMove'
+		@current = newView
+		@current.bringToFront()
 		
 		# fancy animations with magic move
 		for sub in traverseSubLayers newView
