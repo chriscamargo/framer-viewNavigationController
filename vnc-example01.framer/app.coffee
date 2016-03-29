@@ -72,3 +72,9 @@ btnSiri.on Events.Click, ->
 
 btnUpdate.on Events.Click, ->
 	vnc.transition viewUpdate
+	
+# To change the direction of the transition, just add a transition property.
+# "up", "down", "left" and "right" are the only built-in transitions available.
+# Example:
+# btnUpdate.on Events.Click, ->
+# 	vnc.transition viewUpdate, direction = "up"
