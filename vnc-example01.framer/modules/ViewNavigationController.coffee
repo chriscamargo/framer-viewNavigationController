@@ -92,7 +92,6 @@ class exports.ViewNavigationController extends Layer
 		return false if view is @currentView
 		
 		# Setup Views for the transition
-		
 		if direction is DIR.RIGHT
 			view.states.switchInstant  PUSH.RIGHT
 			@currentView.states.switch PUSH.LEFT
@@ -114,20 +113,27 @@ class exports.ViewNavigationController extends Layer
 		view.states.switch PUSH.CENTER
 		# currentView is now our previousView
 		@previousView = @currentView
-		# Set our currentView to the view we're bringing in
+		# Save transition direction to the layer's custom properties
+		@previousView.custom =
+			lastTransition: direction
+		# Set our currentView to the view we've brought in
 		@currentView = view
 
 		# Store the last view in history
 		@history.push @previousView if preventHistory is false
 		
-		@emit Events.Change
+		# Emit an event so the prototype can react to a view change
+		@emit "change:view"
 
 	removeBackButton: (view) ->
 		Utils.delay 0, =>
 			view.subLayersByName(BACKBUTTON_VIEW_NAME)[0].visible = false
 
 	back: () ->
-		@transition(@_getLastHistoryItem(), direction = DIR.LEFT, switchInstant = false, preventHistory = true)
+		lastView = @_getLastHistoryItem()
+		lastTransition = lastView.custom.lastTransition
+		oppositeTransition = @_getOppositeDirection(lastTransition)
+		@transition(lastView, direction = oppositeTransition, switchInstant = false, preventHistory = true)
 		@history.pop()
 
 	_getLastHistoryItem: () ->
@@ -149,6 +155,18 @@ class exports.ViewNavigationController extends Layer
 
 				backButton.on Events.Click, =>
 					@back()
+
+	_getOppositeDirection: (initialDirection) ->
+		if initialDirection is DIR.UP
+			return DIR.DOWN
+		else if initialDirection is DIR.DOWN
+			return DIR.UP
+		else if initialDirection is DIR.RIGHT
+			return DIR.LEFT
+		else if initialDirection is DIR.LEFT
+			return DIR.RIGHT
+		else
+			return DIR.LEFT
 		
     
 
