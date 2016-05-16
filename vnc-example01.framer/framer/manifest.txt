@@ -28,6 +28,7 @@ framer/images/icon-framer.png
 framer/images/icon-framer@2x.png
 framer/images/icon-share.png
 framer/images/icon-share@2x.png
+framer/manifest.txt
 framer/mirror.css
 framer/style.css
 framer/version

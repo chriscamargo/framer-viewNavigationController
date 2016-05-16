@@ -65,10 +65,10 @@ btnUpdate = new Layer
 # EVENTS
 # # # # # # # # # # # # # # # # # # # # # # # #
 btnGeneral.on Events.Click, ->
-	vnc.transition viewGeneral, "up"
+	vnc.transition viewGeneral
 	
 btnSiri.on Events.Click, ->
-	vnc.transition viewSiri, direction = "down"
+	vnc.transition viewSiri
 
 btnUpdate.on Events.Click, ->
 	vnc.transition viewUpdate
