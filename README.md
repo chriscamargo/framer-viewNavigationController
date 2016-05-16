@@ -14,18 +14,20 @@ A simple controller for FramerJS that allows you to transition between views wit
 
 #### How to Get Started
 
-*Step 1:* Include the module in your protoype.
+**Step 1:** Include the module in your protoype.
 ```coffeescript
 {ViewNavigationController} = require "ViewNavigationController"
 ```
 
-*Step 2:* Create a new view controller.
+
+**Step 2:** Create a new view controller.
 ```coffeescript
 vnc = new ViewNavigationController
 ```
 In this case, I've called my view controller `vnc`. By default, the view controller will match the size of the device's screen. You can add `width` and `height` properties to modify the size of the view controller.
 
-*Step 3:* Create your views and add them to the view controller.
+
+**Step 3:** Create your views and add them to the view controller.
 ```coffeescript
 myFirstView = new Layer
 	name: "initialView"
@@ -40,7 +42,8 @@ mySecondView = new Layer
 ```
 To add them to the view controller, just make sure the it's their parent. You can see I've also set the `name` property of `myFirstView` to `initialView`. This tells the view controller that I want to start with this view appearing first.
 
-*Step 4:* Set up a button to change views.
+
+**Step 4:** Set up a button to change views.
 ```coffeescript
 myButton = new Layer
 	width: Screen.width
