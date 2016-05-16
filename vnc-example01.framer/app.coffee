@@ -16,22 +16,22 @@ viewSettings = new Layer
 	name: "initialView"
 	width: 750, height: 1334
 	image: "images/screen_01_settings.png"
-	superLayer: vnc
+	parent: vnc
 
 viewGeneral = new Layer
 	width: 750, height: 1334
 	image: "images/screen_02_general.png"
-	superLayer: vnc
+	parent: vnc
 
 viewSiri = new Layer
 	width: 750, height: 1334
 	image: "images/screen_03_siri.png"
-	superLayer: vnc
+	parent: vnc
 	
 viewUpdate = new Layer
 	width: 750, height: 1334
 	image: "images/screen_04_update.png"
-	superLayer: vnc
+	parent: vnc
 
 # To remove the back button from a view, do this:
 # viewUpdate.backButton = false
@@ -44,31 +44,31 @@ btnGeneral = new Layer
 	height: 88
 	y: 1130
 	backgroundColor: "transparent"
-	superLayer: viewSettings
+	parent: viewSettings
 	
 btnSiri = new Layer
 	width: Screen.width
 	height: 88
 	y: 444
 	backgroundColor: "transparent"
-	superLayer: viewGeneral
+	parent: viewGeneral
 	
 btnUpdate = new Layer
 	width: Screen.width
 	height: 88
 	y: 284
 	backgroundColor: "transparent"
-	superLayer: viewGeneral
+	parent: viewGeneral
 
 
 # # # # # # # # # # # # # # # # # # # # # # # #
 # EVENTS
 # # # # # # # # # # # # # # # # # # # # # # # #
 btnGeneral.on Events.Click, ->
-	vnc.transition viewGeneral
+	vnc.transition viewGeneral, "up"
 	
 btnSiri.on Events.Click, ->
-	vnc.transition viewSiri
+	vnc.transition viewSiri, direction = "down"
 
 btnUpdate.on Events.Click, ->
 	vnc.transition viewUpdate
