@@ -1,12 +1,12 @@
 ## framer-viewNavigationController
-A simple controller for FramerJS that allows you to transition between views with just a couple lines of code.
+fVNC is a simple view controller for FramerJS that allows you to transition between views with just a couple lines of code.
 
 #### Features
-- Built in method for transitioning between views.
-- Customize the transition by choosing up, down, left, or right transitions.
-- Customize the movement by providing animationOptions.
+- Built-in method for transitioning between views.
+- Customize the transition by choosing `up`, `down`, `left`, or `right` transitions.
+- Customize the movement by providing `animationOptions`.
 - Automatically places back buttons in your flow at the top left of your views.
-- Automatically transition backward, using the opposite direction of your initial transition. (v1.1)
+- Automatically transitions backward, using the opposite direction of your initial transition. (v1.1)
 
 #### TODO
 - Allow custom states for building unique screen-to-screen transitions.
@@ -55,6 +55,27 @@ myButton.on Events.Click, ->
 	vnc.transition(mySecondView)
 ```
 Now I can quickly create a button that causes our view controller to change views. I don't need to worry about creating a 'back' button for `mySecondView`, the view controller has already done that for me. And if I add more views and create more transitions, the view controler will remember which views I've seen, and will step me back in the correct order.
+
+#### Methods
+fVNC comes with a few methods built-in to help you do things like transition backward, or remove the automatically created back buttons from an existing view.
+
+##### back()
+To move backward by one history item, simply call the `back()` method.
+```coffeescript
+myBackButton.on Events.Click, ->
+	vnc.back()
+```
+Just remember, if there's no prior view in the history stack, there's nothing to go back to, so nothing will happen.
+
+##### removeBackButton(view)
+To remove the back button from a view, just call `removeBackButton()` and pass in the view you'd like to affect.
+```coffeescript
+vnc.removeBackButton(mySecondView)
+```
+This code will prevent the back button from appearing on `mySecondView`.
+
+#### Feature Requests
+If you'd like to see new features added to fVNC, just drop me a line on Twitter ([@chriscamargo](http://www.twitter.com/chriscamargo)), or better yet, submit a pull request.
 
 #### Changelog
 
