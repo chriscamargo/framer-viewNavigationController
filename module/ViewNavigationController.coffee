@@ -51,7 +51,7 @@ class exports.ViewNavigationController extends Layer
 		vncWidth  = @options.width
 		vncHeight = @options.height
 
-		view.states.add(
+		view.states.add
 			"#{ PUSH.UP }":
 				x: 0
 				y: -vncHeight
@@ -67,7 +67,6 @@ class exports.ViewNavigationController extends Layer
 			"#{ PUSH.DOWN }":
 				x: 0
 				y: vncHeight
-		)
 
 			
 		view.states.animationOptions = @animationOptions
@@ -126,11 +125,11 @@ class exports.ViewNavigationController extends Layer
 		Utils.delay 0, =>
 			view.subLayersByName(BACKBUTTON_VIEW_NAME)[0].visible = false
 
-	back: () ->
+	back: ->
 		@transition(@_getLastHistoryItem(), direction = DIR.LEFT, switchInstant = false, preventHistory = true)
 		@history.pop()
 
-	_getLastHistoryItem: () ->
+	_getLastHistoryItem: ->
 		return @history[@history.length - 1]
 
 	_applyBackButton: (view, frame = @backButtonFrame) ->
