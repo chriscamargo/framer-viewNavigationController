@@ -33,12 +33,12 @@ myFirstView = new Layer
 	name: "initialView"
 	width: 750, height: 1334
 	image: "images/screen01.png"
-	parent: vnc
+	superLayer: vnc
 
 mySecondView = new Layer
 	width: 750, height: 1334
 	image: "images/screen02.png"
-	parent: vnc
+	superLayer: vnc
 ```
 To add them to the view controller, just make sure the it's their parent. You can see I've also set the `name` property of `myFirstView` to `initialView`. This tells the view controller that I want to start with this view appearing first.
 
