@@ -44,7 +44,8 @@ class exports.ViewNavigationController extends Layer
 		@debugMode = if @options.debugMode? then @options.debugMode else DEBUG_MODE
 		
 		@.on "change:subLayers", (changeList) ->
-			@addView subLayer, true for subLayer in changeList.added
+			Utils.delay 0, =>
+				@addView subLayer, true for subLayer in changeList.added
 
 	addView: (view, viaInternalChangeEvent) ->
 		
