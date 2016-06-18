@@ -52,7 +52,7 @@ class exports.ViewNavigationController extends Layer
 		vncWidth  = @options.width
 		vncHeight = @options.height
 
-		view.states.add(
+		view.states.add
 			"#{ PUSH.UP }":
 				x: 0
 				y: -vncHeight
@@ -68,8 +68,6 @@ class exports.ViewNavigationController extends Layer
 			"#{ PUSH.DOWN }":
 				x: 0
 				y: vncHeight
-		)
-
 			
 		view.states.animationOptions = @animationOptions
 		
@@ -182,7 +180,7 @@ class exports.ViewNavigationController extends Layer
 # 	width:  Screen.width
 # 	height: Screen.height
 # 	backgroundColor: "red"
-# 	superLayer: vnc
+# 	parent: vnc
 
 ################################################################################
 # USAGE EXAMPLE 2 - Use default initialViewName "initialView" ##################
@@ -194,13 +192,13 @@ class exports.ViewNavigationController extends Layer
 # 	width:  Screen.width
 # 	height: Screen.height
 # 	backgroundColor: "red"
-# 	superLayer: vnc
+# 	parent: vnc
 	
 # view2 = new Layer
 # 	width:  Screen.width
 # 	height: Screen.height
 # 	backgroundColor: "green"
-# 	superLayer: vnc
+# 	parent: vnc
 
 # view1.on Events.Click, -> vnc.transition view2
 # view2.on Events.Click, -> vnc.back()
