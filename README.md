@@ -1,7 +1,7 @@
-## framer-viewNavigationController
+# framer-viewNavigationController
 fVNC is a simple view controller for FramerJS that allows you to transition between views with just a couple lines of code.
 
-#### Features
+## Features
 - Built-in method for transitioning between views.
 - Customize the transition by choosing `up`, `down`, `left`, or `right` transitions.
 - Customize the movement by providing `animationOptions`.
@@ -12,7 +12,7 @@ fVNC is a simple view controller for FramerJS that allows you to transition betw
 - Allow custom states for building unique screen-to-screen transitions.
 - Moar documentation!
 
-#### How to Get Started
+## How to Get Started
 
 **Step 1:** Include the module in your protoype.
 ```coffeescript
@@ -56,10 +56,10 @@ myButton.on Events.Click, ->
 ```
 Now I can quickly create a button that causes our view controller to change views. I don't need to worry about creating a 'back' button for `mySecondView`, the view controller has already done that for me. And if I add more views and create more transitions, the view controler will remember which views I've seen, and will step me back in the correct order.
 
-#### Methods
+## Methods
 fVNC comes with a few methods built-in to help you do things like transition backward, or remove the automatically created back buttons from an existing view.
 
-##### back()
+#### back()
 To move backward by one history item, simply call the `back()` method.
 ```coffeescript
 myBackButton.on Events.Click, ->
@@ -67,18 +67,21 @@ myBackButton.on Events.Click, ->
 ```
 Just remember, if there's no prior view in the history stack, there's nothing to go back to, so nothing will happen.
 
-##### removeBackButton(view)
+#### removeBackButton(view)
 To remove the back button from a view, just call `removeBackButton()` and pass in the view you'd like to affect.
 ```coffeescript
 vnc.removeBackButton(mySecondView)
 ```
 This code will prevent the back button from appearing on `mySecondView`.
 
-#### Feature Requests
+## Feature Requests
 If you'd like to see new features added to fVNC, just drop me a line on Twitter ([@chriscamargo](http://www.twitter.com/chriscamargo)), or better yet, submit a pull request.
 
-#### Changelog
+## Changelog
 
 ##### v1.1 (Sun, May 15, 2016)
 - fVNC now emits a `change:view` event to notify you when a view change happens.
 - fVNC now keeps track of the transition you use, so the direction is automatically reversed when using 'back'.
+
+##### v1.2 (Fri, Oct 7, 2016)
+- fVNC updated to support Framer v72.
