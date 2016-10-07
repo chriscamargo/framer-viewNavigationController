@@ -24,10 +24,10 @@ class exports.ViewNavigationController extends Layer
 		RIGHT: "right"
 	DEBUG_MODE = false
 		
-	# Setup Instance and Instance Variables	
+	# Setup Instance and Instance Variables
 	constructor: (@options={}) ->
 
-		@views = @history = @initialView = @currentView = @previousView = @animationOptions = @initialViewName = null
+		@views = @history = @initialView = @currentView = @previousView = @initialViewName = null
 		@options.width           ?= Screen.width
 		@options.height          ?= Screen.height
 		@options.clip            ?= true

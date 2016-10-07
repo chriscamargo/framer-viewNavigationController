@@ -1,6 +1,6 @@
 {ViewNavigationController} = require "ViewNavigationController"
 
-bg = new BackgroundLayer
+Screen.backgroundColor = "white"
 
 vnc = new ViewNavigationController
 
