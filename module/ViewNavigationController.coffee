@@ -24,10 +24,10 @@ class exports.ViewNavigationController extends Layer
 		RIGHT: "right"
 	DEBUG_MODE = false
 		
-	# Setup Instance and Instance Variables	
+	# Setup Instance and Instance Variables
 	constructor: (@options={}) ->
 
-		@views = @history = @initialView = @currentView = @previousView = @animationOptions = @initialViewName = null
+		@views = @history = @initialView = @currentView = @previousView = @initialViewName = null
 		@options.width           ?= Screen.width
 		@options.height          ?= Screen.height
 		@options.clip            ?= true
@@ -44,7 +44,8 @@ class exports.ViewNavigationController extends Layer
 		@debugMode = if @options.debugMode? then @options.debugMode else DEBUG_MODE
 		
 		@.on "change:subLayers", (changeList) ->
-			@addView subLayer, true for subLayer in changeList.added
+			Utils.delay 0, =>
+				@addView subLayer, true for subLayer in changeList.added
 
 	addView: (view, viaInternalChangeEvent) ->
 		
@@ -67,7 +68,6 @@ class exports.ViewNavigationController extends Layer
 			"#{ PUSH.DOWN }":
 				x: 0
 				y: vncHeight
-
 			
 		view.states.animationOptions = @animationOptions
 		
@@ -91,7 +91,6 @@ class exports.ViewNavigationController extends Layer
 		return false if view is @currentView
 		
 		# Setup Views for the transition
-		
 		if direction is DIR.RIGHT
 			view.states.switchInstant  PUSH.RIGHT
 			@currentView.states.switch PUSH.LEFT
@@ -113,23 +112,30 @@ class exports.ViewNavigationController extends Layer
 		view.states.switch PUSH.CENTER
 		# currentView is now our previousView
 		@previousView = @currentView
-		# Set our currentView to the view we're bringing in
+		# Save transition direction to the layer's custom properties
+		@previousView.custom =
+			lastTransition: direction
+		# Set our currentView to the view we've brought in
 		@currentView = view
 
 		# Store the last view in history
 		@history.push @previousView if preventHistory is false
 		
-		@emit Events.Change
+		# Emit an event so the prototype can react to a view change
+		@emit "change:view"
 
 	removeBackButton: (view) ->
 		Utils.delay 0, =>
 			view.subLayersByName(BACKBUTTON_VIEW_NAME)[0].visible = false
 
-	back: ->
-		@transition(@_getLastHistoryItem(), direction = DIR.LEFT, switchInstant = false, preventHistory = true)
+	back: () ->
+		lastView = @_getLastHistoryItem()
+		lastTransition = lastView.custom.lastTransition
+		oppositeTransition = @_getOppositeDirection(lastTransition)
+		@transition(lastView, direction = oppositeTransition, switchInstant = false, preventHistory = true)
 		@history.pop()
 
-	_getLastHistoryItem: ->
+	_getLastHistoryItem: () ->
 		return @history[@history.length - 1]
 
 	_applyBackButton: (view, frame = @backButtonFrame) ->
@@ -148,6 +154,18 @@ class exports.ViewNavigationController extends Layer
 
 				backButton.on Events.Click, =>
 					@back()
+
+	_getOppositeDirection: (initialDirection) ->
+		if initialDirection is DIR.UP
+			return DIR.DOWN
+		else if initialDirection is DIR.DOWN
+			return DIR.UP
+		else if initialDirection is DIR.RIGHT
+			return DIR.LEFT
+		else if initialDirection is DIR.LEFT
+			return DIR.RIGHT
+		else
+			return DIR.LEFT
 		
     
 
@@ -162,7 +180,7 @@ class exports.ViewNavigationController extends Layer
 # 	width:  Screen.width
 # 	height: Screen.height
 # 	backgroundColor: "red"
-# 	superLayer: vnc
+# 	parent: vnc
 
 ################################################################################
 # USAGE EXAMPLE 2 - Use default initialViewName "initialView" ##################
@@ -174,13 +192,13 @@ class exports.ViewNavigationController extends Layer
 # 	width:  Screen.width
 # 	height: Screen.height
 # 	backgroundColor: "red"
-# 	superLayer: vnc
+# 	parent: vnc
 	
 # view2 = new Layer
 # 	width:  Screen.width
 # 	height: Screen.height
 # 	backgroundColor: "green"
-# 	superLayer: vnc
+# 	parent: vnc
 
 # view1.on Events.Click, -> vnc.transition view2
 # view2.on Events.Click, -> vnc.back()
