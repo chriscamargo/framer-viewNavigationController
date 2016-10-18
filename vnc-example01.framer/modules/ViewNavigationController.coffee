@@ -2,28 +2,34 @@ class exports.ViewNavigationController extends Layer
 
 	# Setup Class Constants
 	INITIAL_VIEW_NAME = "initialView"
+
 	BACKBUTTON_VIEW_NAME = "vnc-backButton"
+
 	ANIMATION_OPTIONS = 
 		time: 0.3
 		curve: "ease-in-out"
+
 	BACK_BUTTON_FRAME = 
 		x: 0
 		y: 40
 		width: 88
 		height: 88
+
 	PUSH =
 		UP:     "pushUp"
 		DOWN:   "pushDown"
 		LEFT:   "pushLeft"
 		RIGHT:  "pushRight"
 		CENTER: "pushCenter"
+
 	DIR =
 		UP:    "up"
 		DOWN:  "down"
 		LEFT:  "left"
 		RIGHT: "right"
+
 	DEBUG_MODE = false
-		
+
 	# Setup Instance and Instance Variables
 	constructor: (@options={}) ->
 
@@ -32,9 +38,9 @@ class exports.ViewNavigationController extends Layer
 		@options.height          ?= Screen.height
 		@options.clip            ?= true
 		@options.backgroundColor ?= "#999"
-		
+
 		super @options
-		
+
 		@views   = []
 		@history = []
 		@animationOptions = @options.animationOptions or ANIMATION_OPTIONS
@@ -42,13 +48,13 @@ class exports.ViewNavigationController extends Layer
 		@backButtonFrame  = @options.backButtonFrame  or BACK_BUTTON_FRAME
 
 		@debugMode = if @options.debugMode? then @options.debugMode else DEBUG_MODE
-		
+
 		@.on "change:subLayers", (changeList) ->
 			Utils.delay 0, =>
 				@addView subLayer, true for subLayer in changeList.added
 
 	addView: (view, viaInternalChangeEvent) ->
-		
+
 		vncWidth  = @options.width
 		vncHeight = @options.height
 
@@ -68,9 +74,9 @@ class exports.ViewNavigationController extends Layer
 			"#{ PUSH.DOWN }":
 				x: 0
 				y: vncHeight
-			
+
 		view.states.animationOptions = @animationOptions
-		
+
 		if view.name is @initialViewName
 			@initialView = view
 			@currentView = view
@@ -78,18 +84,18 @@ class exports.ViewNavigationController extends Layer
 			@history.push view
 		else
 			view.states.switchInstant PUSH.RIGHT
-		
+
 		unless view.superLayer is @ or viaInternalChangeEvent
 			view.superLayer = @
-			
+
 		@_applyBackButton view unless view.name is @initialViewName
-			
+
 		@views.push view
 
 	transition: (view, direction = DIR.RIGHT, switchInstant = false, preventHistory = false) ->
 
 		return false if view is @currentView
-		
+
 		# Setup Views for the transition
 		if direction is DIR.RIGHT
 			view.states.switchInstant  PUSH.RIGHT
@@ -107,7 +113,7 @@ class exports.ViewNavigationController extends Layer
 			# If they specified something different just switch immediately
 			view.states.switchInstant PUSH.CENTER
 			@currentView.states.switchInstant PUSH.LEFT
-		
+
 		# Push view to Center
 		view.states.switch PUSH.CENTER
 		# currentView is now our previousView
@@ -166,40 +172,47 @@ class exports.ViewNavigationController extends Layer
 			return DIR.RIGHT
 		else
 			return DIR.LEFT
-		
-    
 
-################################################################################
-# USAGE EXAMPLE 1 - Define InitialViewName #####################################
+###
 
-# initialViewKey = "view1"
-# 
-# vnc = new ViewNavigationController initialViewName: initialViewKey
-# view1 = new Layer
-# 	name: initialViewKey
-# 	width:  Screen.width
-# 	height: Screen.height
-# 	backgroundColor: "red"
-# 	parent: vnc
+USAGE EXAMPLE 1 - Define InitialViewName
 
-################################################################################
-# USAGE EXAMPLE 2 - Use default initialViewName "initialView" ##################
+initialViewKey = "view1"
 
-# vnc = new ViewNavigationController
+vnc = new ViewNavigationController
+	initialViewName: initialViewKey
 
-# view1 = new Layer
-# 	name: "initialView"
-# 	width:  Screen.width
-# 	height: Screen.height
-# 	backgroundColor: "red"
-# 	parent: vnc
-	
-# view2 = new Layer
-# 	width:  Screen.width
-# 	height: Screen.height
-# 	backgroundColor: "green"
-# 	parent: vnc
+view1 = new Layer
+	name: initialViewKey
+	width:  Screen.width
+	height: Screen.height
+	backgroundColor: "red"
+	parent: vnc
 
-# view1.on Events.Click, -> vnc.transition view2
-# view2.on Events.Click, -> vnc.back()
-	
+###
+###
+
+USAGE EXAMPLE 2 - Use default initialViewName "initialView"
+
+vnc = new ViewNavigationController
+
+view1 = new Layer
+	name: "initialView"
+	width:  Screen.width
+	height: Screen.height
+	backgroundColor: "red"
+	parent: vnc
+
+view2 = new Layer
+	width:  Screen.width
+	height: Screen.height
+	backgroundColor: "green"
+	parent: vnc
+
+view1.onClick ->
+	vnc.transition view2
+
+view2.onClick ->
+	vnc.back()
+
+###
