@@ -79,9 +79,9 @@ If you'd like to see new features added to fVNC, just drop me a line on Twitter 
 
 ## Changelog
 
-##### v1.1 (Sun, May 15, 2016)
+##### v2 (Sun, May 15, 2016)
 - fVNC now emits a `change:view` event to notify you when a view change happens.
 - fVNC now keeps track of the transition you use, so the direction is automatically reversed when using 'back'.
 
-##### v1.2 (Fri, Oct 7, 2016)
+##### v3 (Fri, Oct 7, 2016)
 - fVNC updated to support Framer v72.
