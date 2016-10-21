@@ -85,3 +85,6 @@ If you'd like to see new features added to fVNC, just drop me a line on Twitter 
 
 ##### v3 (Fri, Oct 7, 2016)
 - fVNC updated to support Framer v72.
+
+##### v4 (Fri, Oct 21, 2016)
+- Fixed a bug with the `removeBackButton` method.  Thanks to @geligelu for finding and reporting this one.

@@ -131,7 +131,7 @@ class exports.ViewNavigationController extends Layer
 		@emit "change:view"
 
 	removeBackButton: (view) ->
-		Utils.delay 0, =>
+		Utils.delay 0.1, =>
 			view.subLayersByName(BACKBUTTON_VIEW_NAME)[0].visible = false
 
 	back: () ->
