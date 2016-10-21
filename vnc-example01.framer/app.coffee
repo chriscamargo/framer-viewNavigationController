@@ -34,7 +34,7 @@ viewUpdate = new Layer
 	parent: vnc
 
 # To remove the back button from a view, do this:
-# viewUpdate.backButton = false
+# vnc.removeBackButton(viewUpdate)
 
 # # # # # # # # # # # # # # # # # # # # # # # #
 # BUTTONS
